@@ -16,53 +16,57 @@
 	
 	by : 	Ali Bassam
 			alibassam.27@gmail.com
+			
+	edited by:	Jonas Krispin
+				jonas.krispin@fh-duesseldorf.de
+	last edited: 02.02.2014
+	
 
 */
-
-function createPie(pieName,pieSize,baseColor,numberOfSlices,percentages,colors){
-	var sizeNum = parseFloat(pieSize.replace("px",""));
+function createPie(pieNameStr,pieSizePxStr,basecolorsStrArr,numberOfSlicesInt,percentagesIntArr,colorsStrArr){
+	var sizeNum = parseFloat(pieSizePxStr.replace("px",""));
 	//Pie Container
 	var pieContainer = document.createElement("div");
-	pieContainer.id=pieName;
+	pieContainer.id=pieNameStr;
 	pieContainer.style.display="inline-block";
 	//Pie Background
 	var pieBackground = document.createElement("div");
-	pieBackground.style.width=pieSize;
-	pieBackground.style.height=pieSize;
+	pieBackground.style.width=pieSizePxStr;
+	pieBackground.style.height=pieSizePxStr;
 	pieBackground.style.position="relative";
-	pieBackground.style.webkitBorderRadius=pieSize;
-	pieBackground.style.mozBorderRadius=pieSize;
-	pieBackground.style.borderRadius=pieSize;
-	pieBackground.style.backgroundColor=baseColor;
+	pieBackground.style.webkitBorderRadius=pieSizePxStr;
+	pieBackground.style.mozBorderRadius=pieSizePxStr;
+	pieBackground.style.borderRadius=pieSizePxStr;
+	pieBackground.style.backgroundColor=basecolorsStrArr;
 	//Append Background to Container
 	pieContainer.appendChild(pieBackground);
 	//Loop through Slices
 	var beforeDegree = 0;
 	var degree = 0;
-	for(var i=0;i<numberOfSlices;i++){
+	for(var i=0;i<numberOfSlicesInt;i++){
 		//New Slice
 		var newSlice = document.createElement("div");
 		newSlice.style.position="absolute";
 		newSlice.style.top="0px"; newSlice.style.left="0px";
-		newSlice.style.width=pieSize;
-		newSlice.style.height=pieSize;
-		newSlice.style.webkitBorderRadius=pieSize;
-		newSlice.style.mozBorderRadius=pieSize;
-		newSlice.style.borderRadius=pieSize;
+		newSlice.style.width=pieSizePxStr;
+		newSlice.style.height=pieSizePxStr;
+		newSlice.style.webkitBorderRadius=pieSizePxStr;
+		newSlice.style.mozBorderRadius=pieSizePxStr;
+		newSlice.style.borderRadius=pieSizePxStr;
 		newSlice.style.clip="rect(0px,"+sizeNum+"px,"+sizeNum+"px,"+((sizeNum)/2)+"px)";
 		//New Slice Pie
 		var pie = document.createElement("div");
-		pie.style.backgroundColor=colors[i];
+		pie.style.backgroundColor=colorsStrArr[i];
 		pie.style.position="absolute";
 		pie.style.top="0px"; pie.style.left="0px";
-		pie.style.width = pieSize;
-		pie.style.height = pieSize; 
-		pie.style.webkitBorderRadius = pieSize;
-		pie.style.mozBorderRadius = pieSize;
-		pie.style.borderRadius = pieSize;
+		pie.style.width = pieSizePxStr;
+		pie.style.height = pieSizePxStr; 
+		pie.style.webkitBorderRadius = pieSizePxStr;
+		pie.style.mozBorderRadius = pieSizePxStr;
+		pie.style.borderRadius = pieSizePxStr;
 		pie.style.clip = "rect(0px, "+((sizeNum)/2)+"px, "+sizeNum+"px, 0px)";
 		//Get Percentage
-		var piePercentage = percentages[i];
+		var piePercentage = percentagesIntArr[i];
 		//Check if Percentage > 50
 		if(piePercentage<=50){
 			degree = parseFloat((180*piePercentage)/50);
@@ -92,11 +96,11 @@ function createPie(pieName,pieSize,baseColor,numberOfSlices,percentages,colors){
 			var newSlice = document.createElement("div");
 			newSlice.style.position="absolute";
 			newSlice.style.top="0px"; newSlice.style.left="0px";
-			newSlice.style.width=pieSize;
-			newSlice.style.height=pieSize;
-			newSlice.style.webkitBorderRadius=pieSize;
-			newSlice.style.mozBorderRadius=pieSize;
-			newSlice.style.borderRadius=pieSize;
+			newSlice.style.width=pieSizePxStr;
+			newSlice.style.height=pieSizePxStr;
+			newSlice.style.webkitBorderRadius=pieSizePxStr;
+			newSlice.style.mozBorderRadius=pieSizePxStr;
+			newSlice.style.borderRadius=pieSizePxStr;
 			newSlice.style.clip="rect(0px,"+sizeNum+"px,"+sizeNum+"px,"+((sizeNum)/2)+"px)";
 			if(i!=0)
 				beforeDegree = beforeDegree-1;
@@ -106,14 +110,14 @@ function createPie(pieName,pieSize,baseColor,numberOfSlices,percentages,colors){
 			if(i!=0)
 				beforeDegree = beforeDegree+1;
 			var pie = document.createElement("div");
-			pie.style.backgroundColor=colors[i];
+			pie.style.backgroundColor=colorsStrArr[i];
 			pie.style.position="absolute";
 			pie.style.top="0px"; pie.style.left="0px";
-			pie.style.width = pieSize;
-			pie.style.height = pieSize; 
-			pie.style.webkitBorderRadius = pieSize;
-			pie.style.mozBorderRadius = pieSize;
-			pie.style.borderRadius = pieSize;
+			pie.style.width = pieSizePxStr;
+			pie.style.height = pieSizePxStr; 
+			pie.style.webkitBorderRadius = pieSizePxStr;
+			pie.style.mozBorderRadius = pieSizePxStr;
+			pie.style.borderRadius = pieSizePxStr;
 			pie.style.clip = "rect(0px, "+((sizeNum)/2)+"px, "+sizeNum+"px, 0px)";
 			degree = parseFloat(((piePercentage-50)*180)/50);
 			if(i!=0)
