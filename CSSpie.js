@@ -103,7 +103,7 @@ Pie.prototype = {
 };
 //NEW -- Pie Klasse Ende --------------------------------------------------------
 
-function createPie(pieNameStr, pieSizePxStr, basecolorStr, percentagesIntArr, colorsStrArr) {
+function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
     var pieObject = new Pie(pieNameStr, pieSizePxStr);
     var pieContainer = pieObject.container();
     var pieBackground = pieObject.background(pieSizePxStr, basecolorStr);
@@ -122,7 +122,7 @@ function createPie(pieNameStr, pieSizePxStr, basecolorStr, percentagesIntArr, co
     // else if percentageSum < 100 -> sliceCount = percentages.size() +1; missingPercentage = 100 - percentageSum;
     // 
     // TODO : handle percentageSum > 100?
-    var numberOfSlicesInt = percentagesIntArr.length;
+    //var numberOfSlicesInt = percentagesIntArr.length;
     for (var i = 0; i < numberOfSlicesInt; i++) {
         //New Slice
         var newSlice = pieObject.createSliceMask();
