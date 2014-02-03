@@ -17,7 +17,7 @@
  by : 	Ali Bassam
  alibassam.27@gmail.com
  
- edited by:	Jonas Krispin
+ edited by:	Jonas Krispin - Object Orientation
  jonas.krispin@fh-duesseldorf.de
  last edited: 02.02.2014
  
@@ -30,7 +30,7 @@ function Pie(_id_String, _sizePxStr) {
             function() {
                 return _id;
             };
-    var _size_Num = parseFloat(_sizePxStr.replace("px", ""));
+    var _size_Num = parseInt(_sizePxStr.replace("px", ""));
     this.size =
             function() {
                 return _size_Num;
@@ -55,11 +55,6 @@ function Pie(_id_String, _sizePxStr) {
                 pieBackground.style.backgroundColor = _basecolorStr;
                 return pieBackground;
             };
-//	var _sliceCount_Int;
-//	var _percentages_IntArr;
-//	var _isSlicesEqualSized_Bool;
-//	var _basecolor_String;
-//	var _sliceColors_StrArr;
 }
 
 // Klassenmethoden
@@ -135,9 +130,9 @@ function createPie(pieNameStr, pieSizePxStr, basecolorStr, percentagesIntArr, co
         var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
         //Get Percentage
         var piePercentage = percentagesIntArr[i];
-        //Check if Percentage > 50
+        
         if (piePercentage <= 50) {
-            degree = parseFloat((180 * piePercentage) / 50);
+            degree = parseInt((180 * piePercentage) / 50);
             sliceFill = pieObject.rotateSlice(sliceFill, degree);
             newSlice.appendChild(sliceFill);
             //If it's not first slice, then ...
@@ -148,31 +143,23 @@ function createPie(pieNameStr, pieSizePxStr, basecolorStr, percentagesIntArr, co
             startDegree += degree;
         }
         else {
-            //newSlice.style.clip = "rect(0px," + (sizeNum) + "px," + (sizeNum) + "px," + ((sizeNum - 100) / 2) + "px)";
+            // adding the 180° part
             newSlice = pieObject.rotateSlice(newSlice, startDegree);
             sliceFill = pieObject.rotateSlice(sliceFill, 180);
             newSlice.appendChild(sliceFill);
-            ////
             pieBackground.appendChild(newSlice);
-            ////
+            
+            // slice for remaining percentage-value
             var newSlice = pieObject.createSliceMask();
-            if (i !== 0)
-                startDegree = startDegree - 1;
+            
+            // closing Gap between 180 part + overflow
+            if (i !== 0) { startDegree = startDegree - 1;}
             newSlice = pieObject.rotateSlice(newSlice, (180 + startDegree));
-            if (i !== 0)
-                startDegree = startDegree + 1;
             var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
-
-            degree = parseFloat(((piePercentage - 50) * 180) / 50);
-            if (i !== 0)
-                degree = degree + 1;
+            degree = parseInt(((piePercentage - 50) * 180) / 50);
             sliceFill = pieObject.rotateSlice(sliceFill, degree);
-            if (i !== 0)
-                degree = degree - 1;
             newSlice.appendChild(sliceFill);
-            ////
             pieBackground.appendChild(newSlice);
-            ///////
             startDegree += (180 + degree);
         }
     }
