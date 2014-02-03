@@ -25,21 +25,16 @@
 
 //NEW --- Pie Objekt ---------------------------------------------------------------
 function Pie(_id_String, _sizePxStr) {
-
-    // public Attribute
     var _id = _id_String;
-    /** returns id of the Pie */
     this.id =
             function() {
                 return _id;
             };
-
     var _size_Num = parseFloat(_sizePxStr.replace("px", ""));
     this.size =
             function() {
                 return _size_Num;
             };
-
     //Pie Container
     var pieContainer = document.createElement("div");
     pieContainer.id = this._id;
@@ -48,7 +43,6 @@ function Pie(_id_String, _sizePxStr) {
             function() {
                 return pieContainer;
             };
-
     this.background =
             function(_pieSizePxStr, _basecolorStr) {
                 pieBackground = document.createElement("div");
@@ -61,21 +55,16 @@ function Pie(_id_String, _sizePxStr) {
                 pieBackground.style.backgroundColor = _basecolorStr;
                 return pieBackground;
             };
-
-
 //	var _sliceCount_Int;
 //	var _percentages_IntArr;
 //	var _isSlicesEqualSized_Bool;
 //	var _basecolor_String;
 //	var _sliceColors_StrArr;
-
-
-
 }
 
 // Klassenmethoden
 Pie.prototype = {
-    createSliceMask: function(){
+    createSliceMask: function() {
         var size = this.size();
         var slice = document.createElement("div");
         slice.style.position = "absolute";
@@ -89,7 +78,7 @@ Pie.prototype = {
         slice.style.clip = "rect(0px," + size + "px," + size + "px," + ((size) / 2) + "px)";
         return slice;
     },
-    createSliceFill: function(colorString){
+    createSliceFill: function(colorString) {
         var size = this.size();
         var pie = document.createElement("div");
         pie.style.backgroundColor = colorString;
@@ -101,110 +90,91 @@ Pie.prototype = {
         pie.style.webkitBorderRadius = size + "px";
         pie.style.mozBorderRadius = size + "px";
         pie.style.borderRadius = size + "px";
-        pie.style.clip = "rect(0px, " + ((size) / 2) + "px, " + size + "px, 0px)"; 
+        pie.style.clip = "rect(0px, " + ((size) / 2) + "px, " + size + "px, 0px)";
         return pie;
+    },
+    /* rotates passed object for passed degree value and returns rotated object.
+     * object       html object to rotate
+     * degreeInt    rotation value in degree
+     * return       rotated html-object 
+     */
+    rotateSlice: function(object, degreeInt) {
+        // rotate to startdegree
+        object.style.webkitTransform = "rotate(" + degreeInt + "deg)";
+        object.style.mozTransform = "rotate(" + degreeInt + "deg)";
+        object.style.transform = "rotate(" + degreeInt + "deg)";
+        return object;
     }
 };
 //NEW -- Pie Klasse Ende --------------------------------------------------------
 
-function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
-
-
+function createPie(pieNameStr, pieSizePxStr, basecolorStr, percentagesIntArr, colorsStrArr) {
     var pieObject = new Pie(pieNameStr, pieSizePxStr);
     var pieContainer = pieObject.container();
     var pieBackground = pieObject.background(pieSizePxStr, basecolorStr);
     //Append Background to Container
     pieContainer.appendChild(pieBackground);
-
     //Loop through Slices
-    var beforeDegree = 0;
+    var startDegree = 0;
     var degree = 0;
     var sizeNum = pieObject.size();
-
-
-
+    // TODO
+    //If only 1 percentage -> all slices that percentage
+    //check coutn percentages
+    //if 1 -> calculate slicecount
+    // else check percentageSum
+    // if percentageSum = 100 ->  sliceCount = percentages.size();
+    // else if percentageSum < 100 -> sliceCount = percentages.size() +1; missingPercentage = 100 - percentageSum;
+    // 
+    // TODO : handle percentageSum > 100?
+    var numberOfSlicesInt = percentagesIntArr.length;
     for (var i = 0; i < numberOfSlicesInt; i++) {
-
         //New Slice
         var newSlice = pieObject.createSliceMask();
         //New Slice Fill
         var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
-        
-        // TODO
-        //If only 1 percentage -> all slices that percentage
-            //check coutn percentages
-            //if 1 -> calculate slicecount
-            // else check percentageSum
-                // if percentageSum = 100 ->  sliceCount = percentages.size();
-                // else if percentageSum < 100 -> sliceCount = percentages.size() +1; missingPercentage = 100 - percentageSum;
-                // 
-                // TODO : handle percentageSum > 100?
         //Get Percentage
         var piePercentage = percentagesIntArr[i];
         //Check if Percentage > 50
         if (piePercentage <= 50) {
             degree = parseFloat((180 * piePercentage) / 50);
-            sliceFill.style.webkitTransform = "rotate(" + degree + "deg)";
-            sliceFill.style.mozTransform = "rotate(" + degree + "deg)";
-            sliceFill.style.transform = "rotate(" + degree + "deg)";
+            sliceFill = pieObject.rotateSlice(sliceFill, degree);
             newSlice.appendChild(sliceFill);
             //If it's not first slice, then ...
-            if (i != 0) {
-                newSlice.style.webkitTransform = "rotate(" + beforeDegree + "deg)";
-                newSlice.style.mozTransform = "rotate(" + beforeDegree + "deg)";
-                newSlice.style.transform = "rotate(" + beforeDegree + "deg)";
+            if (i !== 0) {
+                newSlice = pieObject.rotateSlice(newSlice, startDegree);
             }
             pieBackground.appendChild(newSlice);
-            beforeDegree += degree;
+            startDegree += degree;
         }
         else {
-            newSlice.style.clip = "rect(0px," + (sizeNum) + "px," + (sizeNum) + "px," + ((sizeNum - 100) / 2) + "px)";
-            
-            newSlice.style.webkitTransform = "rotate(" + beforeDegree + "deg)";
-            newSlice.style.mozTransform = "rotate(" + beforeDegree + "deg)";
-            newSlice.style.transform = "rotate(" + beforeDegree + "deg)";
-            
-            sliceFill.style.webkitTransform = "rotate(180deg)";
-            sliceFill.style.mozTransform = "rotate(180deg)";
-            sliceFill.style.transform = "rotate(180deg)";
-            
+            //newSlice.style.clip = "rect(0px," + (sizeNum) + "px," + (sizeNum) + "px," + ((sizeNum - 100) / 2) + "px)";
+            newSlice = pieObject.rotateSlice(newSlice, startDegree);
+            sliceFill = pieObject.rotateSlice(sliceFill, 180);
             newSlice.appendChild(sliceFill);
             ////
             pieBackground.appendChild(newSlice);
             ////
             var newSlice = pieObject.createSliceMask();
-            
-            if (i != 0)
-                beforeDegree = beforeDegree - 1;
-            
-            newSlice.style.webkitTransform = "rotate(" + (180 + beforeDegree) + "deg)";
-            newSlice.style.mozTransform = "rotate(" + (180 + beforeDegree) + "deg)";
-            newSlice.style.transform = "rotate(" + (180 + beforeDegree) + "deg)";
-            
-            if (i != 0)
-                beforeDegree = beforeDegree + 1;
-            
+            if (i !== 0)
+                startDegree = startDegree - 1;
+            newSlice = pieObject.rotateSlice(newSlice, (180 + startDegree));
+            if (i !== 0)
+                startDegree = startDegree + 1;
             var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
-            
+
             degree = parseFloat(((piePercentage - 50) * 180) / 50);
-            if (i != 0)
+            if (i !== 0)
                 degree = degree + 1;
-            
-            sliceFill.style.webkitTransform = "rotate(" + degree + "deg)";
-            sliceFill.style.mozTransform = "rotate(" + degree + "deg)";
-            sliceFill.style.transform = "rotate(" + degree + "deg)";
-            
-            if (i != 0)
+            sliceFill = pieObject.rotateSlice(sliceFill, degree);
+            if (i !== 0)
                 degree = degree - 1;
             newSlice.appendChild(sliceFill);
             ////
             pieBackground.appendChild(newSlice);
             ///////
-            beforeDegree += (180 + degree);
+            startDegree += (180 + degree);
         }
     }
-
-
-
     return pieContainer;
 }
