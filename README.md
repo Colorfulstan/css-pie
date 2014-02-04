@@ -19,7 +19,7 @@ IF YOU WANT TO CONTRIBUTE:
 - Public Methods go separatly (see createPie)
 - Never Change an existing public Method - Mark it as @deprecated and create the new one with different Parameters
 - Use Object oriented design (divide and conquer) for your Methods or mark them through a visible Comment for // REVISION
----------------------------------------------------------------------------------------
+
 
 Possibly Todo:
 ---------
