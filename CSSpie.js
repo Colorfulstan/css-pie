@@ -14,7 +14,7 @@
  code.google.com/p/css-pie/downloads/list
  github.com/AliBassam/css-pie
  
- by : 	Ali Bassam
+ by :	Ali Bassam
  alibassam.27@gmail.com
  
  edited by:	Jonas Krispin - Object Orientation
@@ -23,21 +23,22 @@
  
  */
 
-//NEW --- Pie Objekt ---------------------------------------------------------------
+
+//Pie Objekt ---------------------------------------------------------------
 function Pie(_id_String, _sizePxStr) {
     var _id = _id_String;
     this.id =
             function() {
                 return _id;
             };
-    var _size_Num = parseInt(_sizePxStr.replace("px", ""));
+    var _size_Num = parseFloat(_sizePxStr.replace("px", ""));
     this.size =
             function() {
                 return _size_Num;
             };
     //Pie Container
     var pieContainer = document.createElement("div");
-    pieContainer.id = this._id;
+    pieContainer.id = _id;
     pieContainer.style.display = "inline-block";
     this.container =
             function() {
@@ -59,6 +60,76 @@ function Pie(_id_String, _sizePxStr) {
 
 // Klassenmethoden
 Pie.prototype = {
+    /**
+     * takes degree-value and color to create a slice of the calling pieObject
+     * 
+     * @param {Int} _percentageInt 
+     *                          value how big the slice will be in percent of the pie
+     * @param {Int} _percentageStartInt value at which the slice starts (0=top mid of circle)
+     * @param {String} _colorString color of the slice as String (Name or Hex)
+     * @returns {"div"} Slice of the pie
+     */
+    createSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+        if (_percentageInt <= 50) {
+            return this.createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
+        }
+        else {
+            return this.createBigSlice(_percentageInt, _percentageStartInt, _colorString);
+        }
+    },
+    /**
+     * creates Slice of up to 50% value
+     * @param {Int} _percentageInt - percentage value the slice contains
+     * @param {Int} _percentageStartInt - percentage value to start the slice at
+     * @param {String} _colorString 
+     * @returns {"div"} Container with the big Slice
+     */
+    createSlimSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+        var degree = this.percentageToDegree(_percentageInt);
+        var startDegree = this.percentageToDegree(_percentageStartInt);
+        //New Slice
+        var slice = this.createSliceMask();
+        // if this isnt the first slice and not the second part of a bigSlice
+        if (startDegree !== 0 && startDegree !== 180) {
+            // Size of slice +2
+            degree += 2;
+            // Start of Slice -2
+            startDegree -= 2;
+            // fixes visual glitches somewhat
+            // TODO: better method for fixing visual glitch between pie-slices
+        }
+
+        //New Slice Fill
+        var sliceFill = this.createSliceFill(_colorString);
+        sliceFill = this.rotateSlice(sliceFill, degree);
+        slice.appendChild(sliceFill);
+        slice = this.rotateSlice(slice, startDegree);
+//            }
+        return slice;
+    },
+    /**
+     * creates Slice of values over 50% by dividing it into two parts and 
+     * combining them into a new div which is returned to the caller
+     * 
+     * @param {Int} _percentageInt - percentage value the slice contains
+     * @param {Int} _percentageStartInt - percentage value to start the slice at
+     * @param {String} _colorString 
+     * @returns {"div"} Container with the big Slice
+     */
+    createBigSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+        var sliceContainer = document.createElement("div");
+        var nextSlice = this.createSlimSlice(50, _percentageStartInt, _colorString);
+        // special clipping for 180° part (gap between two parts)
+        var size = this.size();
+        nextSlice.style.clip = "rect(0px," + (size) + "px," + (size) + "px," + ((size - 100) / 2) + "px)";
+        sliceContainer.appendChild(nextSlice);
+        _percentageInt -= 50;
+        _percentageStartInt += 50;
+        //remaining part
+        var nextSlice = this.createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
+        sliceContainer.appendChild(nextSlice);
+        return sliceContainer;
+    },
     createSliceMask: function() {
         var size = this.size();
         var slice = document.createElement("div");
@@ -73,10 +144,10 @@ Pie.prototype = {
         slice.style.clip = "rect(0px," + size + "px," + size + "px," + ((size) / 2) + "px)";
         return slice;
     },
-    createSliceFill: function(colorString) {
+    createSliceFill: function(_colorString) {
         var size = this.size();
         var pie = document.createElement("div");
-        pie.style.backgroundColor = colorString;
+        pie.style.backgroundColor = _colorString;
         pie.style.position = "absolute";
         pie.style.top = "0px";
         pie.style.left = "0px";
@@ -93,15 +164,24 @@ Pie.prototype = {
      * degreeInt    rotation value in degree
      * return       rotated html-object 
      */
-    rotateSlice: function(object, degreeInt) {
+    rotateSlice: function(_object, _degreeFloat) {
         // rotate to startdegree
-        object.style.webkitTransform = "rotate(" + degreeInt + "deg)";
-        object.style.mozTransform = "rotate(" + degreeInt + "deg)";
-        object.style.transform = "rotate(" + degreeInt + "deg)";
-        return object;
-    }
+        _object.style.webkitTransform = "rotate(" + _degreeFloat + "deg)";
+        _object.style.mozTransform = "rotate(" + _degreeFloat + "deg)";
+        _object.style.transform = "rotate(" + _degreeFloat + "deg)";
+        return _object;
+    },
+    /**
+     * Converts Percentage Value of a slice to a degree-value of the circle
+     * Rounds up
+     * @param {Int} percentage of the circle the slice fills
+     * @returns {Int} degree-value (rounded up)
+     */
+    percentageToDegree: function(_percentageInt) {
+        return Math.round(parseFloat((_percentageInt * 180) / 50));
+    },
 };
-//NEW -- Pie Klasse Ende --------------------------------------------------------
+// Pie Klasse Ende --------------------------------------------------------
 
 function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
     var pieObject = new Pie(pieNameStr, pieSizePxStr);
@@ -109,10 +189,6 @@ function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, pe
     var pieBackground = pieObject.background(pieSizePxStr, basecolorStr);
     //Append Background to Container
     pieContainer.appendChild(pieBackground);
-    //Loop through Slices
-    var startDegree = 0;
-    var degree = 0;
-    var sizeNum = pieObject.size();
     // TODO
     //If only 1 percentage -> all slices that percentage
     //check coutn percentages
@@ -123,45 +199,14 @@ function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, pe
     // 
     // TODO : handle percentageSum > 100?
     //var numberOfSlicesInt = percentagesIntArr.length;
+    
+    //Creating the Slices 
+    var percentageUsed = 0;
     for (var i = 0; i < numberOfSlicesInt; i++) {
-        //New Slice
-        var newSlice = pieObject.createSliceMask();
-        //New Slice Fill
-        var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
-        //Get Percentage
         var piePercentage = percentagesIntArr[i];
-        
-        if (piePercentage <= 50) {
-            degree = parseInt((180 * piePercentage) / 50);
-            sliceFill = pieObject.rotateSlice(sliceFill, degree);
-            newSlice.appendChild(sliceFill);
-            //If it's not first slice, then ...
-            if (i !== 0) {
-                newSlice = pieObject.rotateSlice(newSlice, startDegree);
-            }
-            pieBackground.appendChild(newSlice);
-            startDegree += degree;
-        }
-        else {
-            // adding the 180° part
-            newSlice = pieObject.rotateSlice(newSlice, startDegree);
-            sliceFill = pieObject.rotateSlice(sliceFill, 180);
-            newSlice.appendChild(sliceFill);
-            pieBackground.appendChild(newSlice);
-            
-            // slice for remaining percentage-value
-            var newSlice = pieObject.createSliceMask();
-            
-            // closing Gap between 180 part + overflow
-            if (i !== 0) { startDegree = startDegree - 1;}
-            newSlice = pieObject.rotateSlice(newSlice, (180 + startDegree));
-            var sliceFill = pieObject.createSliceFill(colorsStrArr[i]);
-            degree = parseInt(((piePercentage - 50) * 180) / 50);
-            sliceFill = pieObject.rotateSlice(sliceFill, degree);
-            newSlice.appendChild(sliceFill);
-            pieBackground.appendChild(newSlice);
-            startDegree += (180 + degree);
-        }
+            var nextSlice = pieObject.createSlice(piePercentage, percentageUsed, colorsStrArr[i]);
+            pieBackground.appendChild(nextSlice);
+            percentageUsed += piePercentage;
     }
     return pieContainer;
 }
