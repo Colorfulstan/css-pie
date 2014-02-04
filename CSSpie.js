@@ -24,21 +24,52 @@ Usage of the Pie:
 - create Pie-Object with neccessarry Parameters
 - let this object create its slices etc.
  
+ 
+ Known Issues:
+- visual glitch between slices possible but rare
+- % values as size not supported
  */
 
 
 //Pie Objekt ---------------------------------------------------------------
-function Pie(_id_String, _sizePxStr) {
+function Pie(_id_String, _sizeStr) {
+    // ID
     var _id = _id_String;
     this.id =
             function() {
                 return _id;
             };
-    var _size_Num = parseFloat(_sizePxStr.replace("px", ""));
+    //////////////////////////////////
+    
+    //size   
+    var _size = (function(sizeStr){
+        return parseFloat(sizeStr);
+    })(_sizeStr); // return von anonymer Funktion als Wert
+    var _sizeUnit = (function(sizeString){
+        // trim spaces and remove the _size chars from it = unit
+        var unit = sizeString.replace((""+_size),"");
+        unit = String.trim(unit);
+        // DEBUGG: not supporting % usage atm
+        if (unit === '%'){
+            alert("Pie:'" + _id + "' uses % values\n"+"These are not supported by CSSPie.js yet!\n" + "We'll use px instead for now\n" + "Please Inform your Webmaster.");
+            return "px";
+        }
+        return unit;
+    })(_sizeStr);
     this.size =
             function() {
-                return _size_Num;
+                return _size;
             };
+    this.sizeUnit =
+            function(){
+        return _sizeUnit;
+            };
+    this.sizeString =
+        function () {
+            return ("" + _size + _sizeUnit); 
+        };
+    /////////////////////////////////////////
+    
     //Pie Container
     var pieContainer = document.createElement("div");
     pieContainer.id = _id;
@@ -48,14 +79,14 @@ function Pie(_id_String, _sizePxStr) {
                 return pieContainer;
             };
     this.background =
-            function(_pieSizePxStr, _basecolorStr) {
+            function(_pieSizeStr, _basecolorStr) {
                 pieBackground = document.createElement("div");
-                pieBackground.style.width = _pieSizePxStr;
-                pieBackground.style.height = _pieSizePxStr;
+                pieBackground.style.width = _pieSizeStr;
+                pieBackground.style.height = _pieSizeStr;
                 pieBackground.style.position = "relative";
-                pieBackground.style.webkitBorderRadius = _pieSizePxStr;
-                pieBackground.style.mozBorderRadius = _pieSizePxStr;
-                pieBackground.style.borderRadius = _pieSizePxStr;
+                pieBackground.style.webkitBorderRadius = _pieSizeStr;
+                pieBackground.style.mozBorderRadius = _pieSizeStr;
+                pieBackground.style.borderRadius = _pieSizeStr;
                 pieBackground.style.backgroundColor = _basecolorStr;
                 return pieBackground;
             };
@@ -122,9 +153,10 @@ Pie.prototype = {
     _createBigSlice: function(_percentageInt, _percentageStartInt, _colorString) {
         var sliceContainer = document.createElement("div");
         var nextSlice = this._createSlimSlice(50, _percentageStartInt, _colorString);
-        // special clipping for 180° part (gap between two parts)
         var size = this.size();
-        nextSlice.style.clip = "rect(0px," + (size) + "px," + (size) + "px," + ((size - 100) / 2) + "px)";
+        var unit = this.sizeUnit();
+        // special clipping for 180° part (gap between two parts)
+        nextSlice.style.clip = "rect(0" + unit + "," + size + unit + "," + size + unit + "," + ((size - 100) / 2) + unit + ")";
         sliceContainer.appendChild(nextSlice);
         _percentageInt -= 50;
         _percentageStartInt += 50;
@@ -135,31 +167,35 @@ Pie.prototype = {
     },
     _createSliceMask: function() {
         var size = this.size();
+        var unit = this.sizeUnit();
+        var sizeString = this.sizeString();
         var slice = document.createElement("div");
         slice.style.position = "absolute";
-        slice.style.top = "0px";
-        slice.style.left = "0px";
-        slice.style.width = size + "px";
-        slice.style.height = size + "px";
-        slice.style.webkitBorderRadius = size + "px";
-        slice.style.mozBorderRadius = size + "px";
-        slice.style.borderRadius = size + "px";
-        slice.style.clip = "rect(0px," + size + "px," + size + "px," + ((size) / 2) + "px)";
+        slice.style.top = "0" + unit;
+        slice.style.left = "0" + unit;
+        slice.style.width = sizeString;
+        slice.style.height = sizeString;
+        slice.style.webkitBorderRadius = sizeString;
+        slice.style.mozBorderRadius = sizeString;
+        slice.style.borderRadius = sizeString;
+        slice.style.clip = "rect(0" + unit + "," + sizeString + "," + sizeString + "," + ((size) / 2) + unit + ")";
         return slice;
     },
     _createSliceFill: function(_colorString) {
         var size = this.size();
+        var unit = this.sizeUnit();
+        var sizeString = this.sizeString();
         var pie = document.createElement("div");
         pie.style.backgroundColor = _colorString;
         pie.style.position = "absolute";
-        pie.style.top = "0px";
-        pie.style.left = "0px";
-        pie.style.width = size + "px";
-        pie.style.height = size + "px";
-        pie.style.webkitBorderRadius = size + "px";
-        pie.style.mozBorderRadius = size + "px";
-        pie.style.borderRadius = size + "px";
-        pie.style.clip = "rect(0px, " + ((size) / 2) + "px, " + size + "px, 0px)";
+        pie.style.top = "0" + unit;
+        pie.style.left = "0" + unit;
+        pie.style.width = sizeString;
+        pie.style.height = sizeString;
+        pie.style.webkitBorderRadius = sizeString;
+        pie.style.mozBorderRadius = sizeString;
+        pie.style.borderRadius = sizeString;
+        pie.style.clip = "rect(0" + unit + ", " + ((size) / 2) + unit + ", " + sizeString + ", 0" + unit+ ")";
         return pie;
     },
      /** rotates passed object for passed degree value and returns rotated object.
@@ -191,7 +227,7 @@ Pie.prototype = {
  * Creates a pie with passed parameters
  * 
  * @param {String} pieNameStr - id tag of the pie
- * @param {String} pieSizePxStr - size of the pie (currently only px) TODO
+ * @param {String} pieSizeStr - size of the pie (currently only px) TODO
  * @param {String} basecolorStr - any legal css color-value
  *                      - "transparent" = explicit transparent background
  *                      - false-statement like null, "none" etc: no background-color attribute 
@@ -203,10 +239,10 @@ Pie.prototype = {
  * @returns {"div"} - your pie as HTML-code with inline-styling 
  *              TODO: replace inline-styling with stylesheet / classes
  */
-function createPie(pieNameStr, pieSizePxStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
-    var pieObject = new Pie(pieNameStr, pieSizePxStr);
+function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
+    var pieObject = new Pie(pieNameStr, pieSizeStr);
     var pieContainer = pieObject.container();
-    var pieBackground = pieObject.background(pieSizePxStr, basecolorStr);
+    var pieBackground = pieObject.background(pieSizeStr, basecolorStr);
     //Append Background to Container
     pieContainer.appendChild(pieBackground);
     // TODO
