@@ -23,10 +23,11 @@ IF YOU WANT TO CONTRIBUTE:
 
 Possibly Todo:
 ---------
-- creating Constructor for Pie()?
-- option to divide the pie in equal slices
 - handling number of slices != number of percentages
 - handling sum of percentages > 100
+- creating internal-class Slice in Pie -> Pie handling nodes returning slices
+- options to manipulate slices already created
+- (option to divide the pie in equal slices)
 - integration of css-transitions
 - integration of different Tags then div (img, a)
 - integration of Captions and labels
