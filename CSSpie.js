@@ -85,6 +85,89 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
                 return pieWrapper;
             };
     //////////////////////////
+    // All the Slices in this Pie
+
+    // Each Slice holds it own percentage
+    // Pie handles references on Slices (Linked List)
+    // if new slice is added, pie gets created newly!?
+    var _firstSlice = null;
+    this.first = function() {
+        return _firstSlice;
+    };
+    var _lastSlice = null;
+    this.last = function() {
+        return _lastSlice;
+    };
+    var _currentSlice = null;
+    this.current = function() {
+        return _currentSlice;
+    };
+    // this.next()
+    // this.previous()
+    // this.hasNext()
+    // this.hasPrevious()
+    // this.iterator()
+    // 
+    /**
+     * Adds a Slice after possibly existing Slices and moves Cursor to the new slice
+     * @param {Int} _percentageInt 
+     *                          value how big the slice will be in percent of the pie
+     * @param {Int} _percentageStartInt value at which the slice starts (0=top mid of circle)
+     * @param {String} _colorStr color of the slice as String (any legal css colorvalue)
+     * @returns {Slice} the added, new currentSlice
+     */
+    this.addSlice = function(_percentageInt, _percentageStartInt, _colorStr) {
+        var newSlice = new Slice(this, _percentageInt, _percentageStartInt, _colorStr);
+        //  already existing slices
+        if (_firstSlice !== null) {
+            _currentSlice.next = newSlice;
+            newSlice.previous = _currentSlice;
+            _lastSlice = newSlice;
+            _currentSlice = newSlice;
+        }
+        // newSLice is first Slice
+        else {
+            _firstSlice = newSlice;
+            _currentSlice = newSlice;
+            _lastSlice = newSlice;
+        }
+        this.container().appendChild(newSlice.html());
+        return _currentSlice;
+    };
+    // this.getSlice(_indexOfSliceInt)
+    // this.drawSlices()
+    // this.dropSlices()
+    // this.update()
+
+    // inner-Object Slice //////////
+    /** Object representation of a slice of the pie
+     * 
+     * @param {type} _pie - the pie this slice belongs to
+     * @param {Int} _percentageInt 
+     *                          value how big the slice will be in percent of the pie
+     * @param {Int} _percentageStartInt - value at which the slice starts (0=top mid of circle)
+     * @param {String} _colorStr color of the slice as String (any legal css colorvalue)
+     * @returns {Pie.Slice}
+     */
+    function Slice(_pie, _percentageInt, _percentageStartInt, _colorStr) {
+        var pie = _pie;
+        var _percentageCovered = _percentageInt;
+        var _color = _colorStr;
+        // als linked List/Ring aufbauen?
+        this.next = null;
+        this.previous = null;
+        var _html = pie.createSlice(_percentageCovered, _percentageStartInt, _color);
+        this.html = function() {
+            return _html;
+        };
+    }
+    ;
+    /////////////////////////////////////////////////////////////////////////////////
+    function Iterator() {
+        // TODO
+    }
+    ;
+
 }
 
 // Klassenmethoden
@@ -266,8 +349,9 @@ function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, perc
     var percentageUsed = 0;
     for (var i = 0; i < numberOfSlicesInt; i++) {
         var piePercentage = percentagesIntArr[i];
-        var nextSlice = pieObject.createSlice(piePercentage, percentageUsed, colorsStrArr[i]);
-        pieObject.container().appendChild(nextSlice);
+        pieObject.addSlice(piePercentage, percentageUsed, colorsStrArr[i]);
+//        var nextSlice = pieObject.createSlice(piePercentage, percentageUsed, colorsStrArr[i]);
+//        pieObject.container().appendChild(nextSlice);
         percentageUsed += piePercentage;
     }
     return pieObject.wrapper();
@@ -294,7 +378,7 @@ function createEquallyDividedPie(pieNameStr, pieSizeStr, basecolorStr, numberOfS
     // round up = last slice smaller or perhaps not present
     // round down = gap after last one
     // dont round yet, getting rounded after degree-conversion anyways = max 0.9*n degree overlap on end, min ~0.1*n degree
-    var percentPerSlice = 100/numberOfSlicesInt;
+    var percentPerSlice = 100 / numberOfSlicesInt;
     //Creating the Slices 
     var percentageUsed = 0;
     for (var i = 0; i < numberOfSlicesInt; i++) {
@@ -302,8 +386,7 @@ function createEquallyDividedPie(pieNameStr, pieSizeStr, basecolorStr, numberOfS
         // actual size of the array doesnt matter
         var nxtClrIndex = i % colorsStrArr.length;
         var nextColor = colorsStrArr[nxtClrIndex];
-        var nextSlice = pieObject.createSlice(percentPerSlice, percentageUsed, nextColor);
-        pieObject.container().appendChild(nextSlice);
+        pieObject.addSlice(percentPerSlice, percentageUsed, nextColor);
         percentageUsed += percentPerSlice;
     }
     return pieObject.wrapper();
