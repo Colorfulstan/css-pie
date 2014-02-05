@@ -33,6 +33,7 @@
 
 //Pie Objekt ---------------------------------------------------------------
 function Pie(_id_String, _sizeStr, _basecolorStr) {
+    ////////////////////// THE PIE FOUNDATION //////////////////////////////
     // ID
     var _id = _id_String;
     this.id =
@@ -68,24 +69,20 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
     this.sizeString = function() {
         return ("" + _size + _sizeUnit);
     };
-    /////////////////////////////////////////
+    /////////////////////////////
 
     // pieContainer - background of the pie and container for the slices
     var pieBackground = this._createBackground(_basecolorStr);
-    this.container = function(_basecolorStr) {
-        return pieBackground;
-    };
+    this.container = function() { return pieBackground; };
     //Pie Wrapper - the wrapping div of the resulting pie
     var pieWrapper = document.createElement("div");
     pieWrapper.id = _id;
     pieWrapper.style.display = "inline-block";
     pieWrapper.appendChild(pieBackground);
-    this.wrapper =
-            function() {
-                return pieWrapper;
-            };
-    //////////////////////////
-    // All the Slices in this Pie
+    this.wrapper = function() { return pieWrapper; };
+    ////////////////////// ////////////////////// //////////////////////////////
+    
+    ////////////////////// Slice Management //////////////////////////////
 
     // Each Slice holds it own percentage
     // Pie handles references on Slices (Linked List)
@@ -102,10 +99,23 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
     this.current = function() {
         return _currentSlice;
     };
-    // this.next()
-    // this.previous()
-    // this.hasNext()
-    // this.hasPrevious()
+    // REVISION: linking it as list atm, should link it as circle?
+    this.next = function(){
+        if(!_currentSlice.equal(_lastSlice)) return _currentSlice.next;
+        else return _currentSlice;
+    };
+    this.previous = function(){
+        if(!_currentSlice.equal(_firstSlice)) return _currentSlice.previous;
+        else return _currentSlice;
+    };
+    this.hasNext = function(){
+        if(!_currentSlice.equal(this.next())) return true;
+        else return false;
+    };
+    this.hasPrevious = function(){
+        if(!_currentSlice.equal(this.previous())) return true;
+        else return false;
+    };
     // this.iterator()
     // 
     /**
@@ -134,10 +144,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.container().appendChild(newSlice.html());
         return _currentSlice;
     };
+    
     // this.getSlice(_indexOfSliceInt)
     // this.drawSlices()
     // this.dropSlices()
     // this.update()
+    this.count = function(){
+        if (_lastSlice !== null){
+            return _lastSlice.id();
+        } else
+            return 0;
+    };
 
     // inner-Object Slice //////////
     /** Object representation of a slice of the pie
@@ -151,22 +168,39 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
      */
     function Slice(_pie, _percentageInt, _percentageStartInt, _colorStr) {
         var pie = _pie;
+        var _id = 1;
+        if (pie.first() !== null){
+            // use id of currentSlice becauseinsertion will always be behind the currentSlice
+            _id = (pie.current().id()) + 1;
+        }
+        this.id = function(){
+            return _id;
+        };
         var _percentageCovered = _percentageInt;
+        var _percentageStartingAt = _percentageStartInt;
         var _color = _colorStr;
         // als linked List/Ring aufbauen?
         this.next = null;
         this.previous = null;
-        var _html = pie.createSlice(_percentageCovered, _percentageStartInt, _color);
+        var _html = pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
         this.html = function() {
             return _html;
         };
-    }
-    ;
+        Slice.prototype = {
+            equal : function(_sliceToCompareTo){
+                // TODO: more parameters for comparisson and perhaps compare() method
+                var equalId = this.id() === _sliceToCompareTo.id();
+                if (equalId){
+                    return true;
+                }
+            },
+        
+        };
+    };
     /////////////////////////////////////////////////////////////////////////////////
     function Iterator() {
         // TODO
-    }
-    ;
+    };
 
 }
 
