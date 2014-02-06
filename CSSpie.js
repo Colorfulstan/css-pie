@@ -105,7 +105,7 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
     };
     // REVISION: linking it as list atm, should link it as circle?
     this.next = function() {
-        if (!_currentSlice.equal(_lastSlice)){
+        if (!_currentSlice.equal(_lastSlice)) {
             _currentSlice = _currentSlice.next;
             return _currentSlice;
         }
@@ -113,9 +113,10 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return _currentSlice;
     };
     this.previous = function() {
-        if (!_currentSlice.equal(_firstSlice)){
+        if (!_currentSlice.equal(_firstSlice)) {
             _currentSlice = _currentSlice.previous;
-            return _currentSlice;}
+            return _currentSlice;
+        }
         else
             return _currentSlice;
     };
@@ -159,30 +160,32 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         return _currentSlice;
     };
 
-    // this.getSlice(_indexOfSliceInt)
+    this.getSliceById = function(_indexOfSliceInt) {
+        return this.first().findId(_indexOfSliceInt);
+    };
     // this.drawSlices()
     // this.dropSlices()
     // WIP /////////////////////////
-     this.update = function(){
+    this.update = function() {
         var it = this.iterator();
         var current = it.first();
         // dropSLices()
-        while(current !== null){
+        while (current !== null) {
             // update following ids if the current and following id are not correct
             // (counting up 1 per slice)
-             if (current.hasNext() && current.id() !== (current.next.id()-1)){
-                 // if current SLice is first and the ids dont fit, set it back to 1
-                 // and start from that with updating the following ids
-                 if (this.equal(it.first())){
-                     this.newId(1);
-                 }
-                current.updateFollowingIds();
+            if (current.hasNext() && current.id() !== (current.next.id() - 1)) {
+                // if current SLice is first and the ids dont fit, set it back to 1
+                // and start from that with updating the following ids
+                if (this.equal(it.first())) {
+                    this.newId(1);
+                }
+                current._updateFollowingIds();
             }
-            alert("Currently processing: " + current.id()); // DEBUGG INFO
+//            alert("Currently processing: " + current.id()); // DEBUGG INFO
             current = it.next();
         }
         // drawSLices()
-     };
+    };
     this.count = function() {
         if (_lastSlice !== null) {
             return _lastSlice.id();
@@ -212,44 +215,83 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.id = function() {
             return _id;
         };
-        this.newId = function(idInt){
+        this.newId = function(idInt) {
             _id = idInt;
-        }
+        };
         var _percentageCovered = _percentageInt;
         var _percentageStartingAt = _percentageStartInt;
         var _color = _colorStr;
         // als linked List/Ring aufbauen?
         this.next = null;
-        this.hasNext = function(){
+        this.hasNext = function() {
             return (this.next !== null);
         };
         this.previous = null;
-        this.hasPrevious = function(){
+        this.hasPrevious = function() {
             return (this.previous !== null);
         };
         var _html = pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
         this.html = function() {
             return _html;
         };
-    };
-        Slice.prototype = {
-            equal: function(_sliceToCompareTo) {
-                // TODO: more parameters for comparisson and perhaps compare() method
-                var equalId = this.id() === _sliceToCompareTo.id();
-                if (equalId) {
-                    return true;
-                }
-            },
-            updateFollowingIds: function(){
-            var next = this.next;
-                if (next !== null){ 
-                    next.updateFollowingIds();
-                    next.newId((this.id()) + 1);
-                } 
-                alert("currently processing: " + this.id()); // DEBUGG INFO
-                return;
+    }
+    ;
+    Slice.prototype = {
+        /**
+         * Checks if the calling Slice equals the passed Slice
+         * @param {Slice} _sliceToCompareTo
+         * @returns {Boolean}
+         */
+        equal: function(_sliceToCompareTo) {
+            // TODO: more parameters for comparisson and perhaps compare() method
+            var equalId = this.id() === _sliceToCompareTo.id();
+            if (equalId) {
+                return true;
             }
-        };
+        },
+        /**
+         * Sets the ids of the SLices in Order which follows to the calling Slice
+         * 
+         */
+        _updateFollowingIds: function() {
+            var next = this.next;
+            if (next !== null) {
+                next._updateFollowingIds();
+                next.newId((this.id()) + 1);
+            }
+//                alert("currently processing: " + this.id()); // DEBUGG INFO
+            return;
+        },
+        /**
+         * Cycles through all Slices to find the passed Slice
+         * @param {type} _sliceToFind
+         * @returns {Boolean} - returns true if Slice is found
+         */
+        _isSliceInPie: function(_sliceToFind) {
+            if (this.equal(_sliceToFind)) {
+                return true;
+            }
+            var next = this.next;
+            if (next !== null) {
+                return next.isSliceInPie(_sliceToFind);
+            }
+//                alert("currently processing: " + this.id()); // DEBUGG INFO
+            return false;
+        },
+        /**
+         * Cycles through all Slices to find the Slice with passed id
+         * @param {type} _idToFindInt
+         * @returns {Pie.Slice.prototype} - returns Slice if found or null if not in Pie
+         */
+        _findId: function(_idToFindInt) {
+            if (this.id() === _idToFindInt) {
+                return this;
+            } else if (this.next !== null) {
+                return this.next.findId(_idToFindInt);
+            }
+            return null;
+        }
+    };
     ;
     /////////////////////////////////////////////////////////////////////////////////
     function Iterator(_pie) {
@@ -261,15 +303,16 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return _pie.last();
         };
         this.next = function() {
-                _currentSlice = _currentSlice.next;
-                return _currentSlice;
+            _currentSlice = _currentSlice.next;
+            return _currentSlice;
         };
         this.previous = function() {
-                _currentSlice = _currentSlice.previous;
-                return _currentSlice.previous;
+            _currentSlice = _currentSlice.previous;
+            return _currentSlice.previous;
         };
-    };
-    this.iterator = function(){
+    }
+    ;
+    this.iterator = function() {
         return new Iterator(this);
     };
 
@@ -459,7 +502,6 @@ function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, perc
 //        pieObject.container().appendChild(nextSlice);
         percentageUsed += piePercentage;
     }
-    pieObject.update();
     return pieObject.wrapper();
 }
 /** creates a pie that is equally divided into slices
