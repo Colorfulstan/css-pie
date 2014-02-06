@@ -159,32 +159,73 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.container().appendChild(newSlice.html());
         return _currentSlice;
     };
+    
+    /**
+     * Removes a slice from the pie and updates its html.
+     * @param {type} _sliceIdToRemove
+     * @returns {undefined}
+     */
+    this.removeSlice = function(_sliceIdToRemove){
+        // find Slice
+        var needle = this.getSliceById(_sliceIdToRemove);
+        // If Slice was found
+        if (needle !== null){
+            needle._removeFromLinks();
+            if (needle.equal(_firstSlice)){
+                _firstSlice = needle.next;
+            }
+            if (needle.equal(_lastSlice)){
+                _lastSlice = needle.previous;
+            }
+            if (needle.equal(_currentSlice)){
+                _currentSlice = null;
+            }
+            this.update();
+        }
+    };
 
     this.getSliceById = function(_indexOfSliceInt) {
-        return this.first().findId(_indexOfSliceInt);
+        return this.first()._findId(_indexOfSliceInt);
     };
-    // this.drawSlices()
-    // this.dropSlices()
+    this.drawSlices = function(){
+        var it = this.iterator();
+        var current = it.first();
+        while(current !== null){
+            this.container().appendChild(current.html());
+            current = it.next();
+        }
+        
+    };
+     this.dropSlices= function(){
+         while (this.container().hasChildNodes()){
+             this.container().removeChild(this.container().firstChild);
+         }
+     };
     // WIP /////////////////////////
     this.update = function() {
         var it = this.iterator();
         var current = it.first();
-        // dropSLices()
+        this.dropSlices();
         while (current !== null) {
             // update following ids if the current and following id are not correct
             // (counting up 1 per slice)
-            if (current.hasNext() && current.id() !== (current.next.id() - 1)) {
-                // if current SLice is first and the ids dont fit, set it back to 1
-                // and start from that with updating the following ids
-                if (this.equal(it.first())) {
-                    this.newId(1);
+            
+            // if current SLice is first set its id to 1
+            if (current.equal(it.first())) {
+                    current.newId(1);
+                    current.setPercentages(0,current.percentageSize());
                 }
+            // if ids dont match the order
+            if (current.hasNext() && current.id() !== (current.next.id() - 1)) {
+                // start from that with updating the following ids
                 current._updateFollowingIds();
             }
 //            alert("Currently processing: " + current.id()); // DEBUGG INFO
             current = it.next();
         }
-        // drawSLices()
+        // and update following percentages
+        it.first()._updateFollowingPercentages();
+        this.drawSlices();
     };
     this.count = function() {
         if (_lastSlice !== null) {
@@ -219,7 +260,22 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _id = idInt;
         };
         var _percentageCovered = _percentageInt;
+        this.percentageSize = function(){
+            return _percentageCovered;
+        };
         var _percentageStartingAt = _percentageStartInt;
+        this.percentageStart = function(){
+            return _percentageStartingAt;
+        };
+        var _percentageEndingAt = _percentageStartingAt + _percentageCovered;
+        this.percentageEnd = function(){
+            return _percentageEndingAt;
+        };
+        this.setPercentages = function(_start, _covered){
+            _percentageCovered = _covered;
+            _percentageStartingAt = _start;
+            _percentageEndingAt = _start + _covered;
+        };
         var _color = _colorStr;
         // als linked List/Ring aufbauen?
         this.next = null;
@@ -230,9 +286,8 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.hasPrevious = function() {
             return (this.previous !== null);
         };
-        var _html = pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
         this.html = function() {
-            return _html;
+            return pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
         };
     }
     ;
@@ -256,11 +311,23 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         _updateFollowingIds: function() {
             var next = this.next;
             if (next !== null) {
-                next._updateFollowingIds();
                 next.newId((this.id()) + 1);
+                next._updateFollowingIds();
             }
 //                alert("currently processing: " + this.id()); // DEBUGG INFO
             return;
+        },
+        _updateFollowingPercentages: function(){
+            var next = this.next;
+            if(next !== null){
+//            alert(this.percentageEnd() + " " + next.percentageStart());
+                next.setPercentages(this.percentageEnd(),next.percentageSize());
+//            alert(this.percentageEnd() + " " + next.percentageStart());
+                next._updateFollowingPercentages();
+            }
+            else {
+                return;
+            }
         },
         /**
          * Cycles through all Slices to find the passed Slice
@@ -285,11 +352,28 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          */
         _findId: function(_idToFindInt) {
             if (this.id() === _idToFindInt) {
+//                alert("found " + this.id());
                 return this;
             } else if (this.next !== null) {
-                return this.next.findId(_idToFindInt);
+                return this.next._findId(_idToFindInt);
             }
             return null;
+        },
+                /**
+                 * Redirects the references from surrounding Slices to remove
+                 * the calling Slice from the links
+                 * @returns {Pie.Slice.prototype} the removed Slice
+                 */
+        _removeFromLinks: function(){
+            var previous = this.previous;
+            var next = this.next;
+            if (previous!== null){
+                previous.next = next;
+            }
+            if (next !== null){
+                next.previous = previous;
+            }
+            return this;
         }
     };
     ;
@@ -463,23 +547,8 @@ Pie.prototype = {
 /////////////////               Library - Methods           ////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Creates a pie with passed parameters
- * 
- * @param {String} pieNameStr - id tag of the pie
- * @param {String} pieSizeStr - size of the pie (no % support) TODO
- * @param {String} basecolorStr - any legal css color-value
- *                      - "transparent" = explicit transparent background
- *                      - false-statement like null, "none" etc: no background-color attribute 
- *                      TODO: handle second case to fallback to transparent background!?
- * @param {Int} numberOfSlicesInt - how many slices you need drawn?
- * @param {Int-Array} percentagesIntArr 
- *                      - the percentage-values of the slices (only using the first n = numberOfSlicesInt values)
- * @param {String-Array} colorsStrArr - Array of basecolorStr values (only using the first n = numberOfSlicesInt values)
- * @returns {"div"} - your pie as HTML-code with inline-styling 
- *              TODO: replace inline-styling with stylesheet / classes
- */
-function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
+function createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr){
+    
     var pieObject = new Pie(pieNameStr, pieSizeStr, basecolorStr);
     ////////////////////////////////////////
     // TODO
@@ -502,7 +571,28 @@ function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, perc
 //        pieObject.container().appendChild(nextSlice);
         percentageUsed += piePercentage;
     }
-    return pieObject.wrapper();
+    return pieObject;
+}
+
+/**
+ * Creates a pie with passed parameters
+ * 
+ * @param {String} pieNameStr - id tag of the pie
+ * @param {String} pieSizeStr - size of the pie (no % support) TODO
+ * @param {String} basecolorStr - any legal css color-value
+ *                      - "transparent" = explicit transparent background
+ *                      - false-statement like null, "none" etc: no background-color attribute 
+ *                      TODO: handle second case to fallback to transparent background!?
+ * @param {Int} numberOfSlicesInt - how many slices you need drawn?
+ * @param {Int-Array} percentagesIntArr 
+ *                      - the percentage-values of the slices (only using the first n = numberOfSlicesInt values)
+ * @param {String-Array} colorsStrArr - Array of basecolorStr values (only using the first n = numberOfSlicesInt values)
+ * @returns {"div"} - your pie as HTML-code with inline-styling 
+ *              TODO: replace inline-styling with stylesheet / classes
+ */
+function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
+    var pieContainer = createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr);
+    return pieContainer.wrapper();
 }
 /** creates a pie that is equally divided into slices
  * ColorArray gets looped over when too few colors are provided
