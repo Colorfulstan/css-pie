@@ -162,7 +162,27 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
     // this.getSlice(_indexOfSliceInt)
     // this.drawSlices()
     // this.dropSlices()
-    // this.update()
+    // WIP /////////////////////////
+     this.update = function(){
+        var it = this.iterator();
+        var current = it.first();
+        // dropSLices()
+        while(current !== null){
+            // update following ids if the current and following id are not correct
+            // (counting up 1 per slice)
+             if (current.hasNext() && current.id() !== (current.next.id()-1)){
+                 // if current SLice is first and the ids dont fit, set it back to 1
+                 // and start from that with updating the following ids
+                 if (this.equal(it.first())){
+                     this.newId(1);
+                 }
+                current.updateFollowingIds();
+            }
+            alert("Currently processing: " + current.id()); // DEBUGG INFO
+            current = it.next();
+        }
+        // drawSLices()
+     };
     this.count = function() {
         if (_lastSlice !== null) {
             return _lastSlice.id();
@@ -192,16 +212,26 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.id = function() {
             return _id;
         };
+        this.newId = function(idInt){
+            _id = idInt;
+        }
         var _percentageCovered = _percentageInt;
         var _percentageStartingAt = _percentageStartInt;
         var _color = _colorStr;
         // als linked List/Ring aufbauen?
         this.next = null;
+        this.hasNext = function(){
+            return (this.next !== null);
+        };
         this.previous = null;
+        this.hasPrevious = function(){
+            return (this.previous !== null);
+        };
         var _html = pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
         this.html = function() {
             return _html;
         };
+    };
         Slice.prototype = {
             equal: function(_sliceToCompareTo) {
                 // TODO: more parameters for comparisson and perhaps compare() method
@@ -210,18 +240,25 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
                     return true;
                 }
             },
+            updateFollowingIds: function(){
+            var next = this.next;
+                if (next !== null){ 
+                    next.updateFollowingIds();
+                    next.newId((this.id()) + 1);
+                } 
+                alert("currently processing: " + this.id()); // DEBUGG INFO
+                return;
+            }
         };
-    }
     ;
     /////////////////////////////////////////////////////////////////////////////////
     function Iterator(_pie) {
-        // TODO
         var _currentSlice = _pie.first();
         this.first = function() {
-            return _pie.first()
+            return _pie.first();
         };
         this.last = function() {
-            return _pie.last()
+            return _pie.last();
         };
         this.next = function() {
                 _currentSlice = _currentSlice.next;
@@ -422,6 +459,7 @@ function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, perc
 //        pieObject.container().appendChild(nextSlice);
         percentageUsed += piePercentage;
     }
+    pieObject.update();
     return pieObject.wrapper();
 }
 /** creates a pie that is equally divided into slices
