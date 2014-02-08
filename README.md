@@ -27,9 +27,11 @@ Possibly Todo:
 ---------
 - handling number of slices != number of percentages
 - handling sum of percentages > 100
+- handling slice-movement (should it change size of the wrapping/container?
 - options to manipulate slices already created
 - (option to divide the pie in equal slices after creation)
 - integration of css-transitions
+- integration of animations (explosion effect with offsetslice)
 - integration of different Tags then div (img, a)
 - integration of Captions and labels
 - more options for styling the pie and the slices(.classes perhaps)
@@ -37,4 +39,3 @@ Possibly Todo:
 
 WIP:
 ----
-- letting the pie/Slice handle to offset a Slice/itself to a value from the middle of the circle, moving along a line with an angle half way between start and ending angle of the slice
