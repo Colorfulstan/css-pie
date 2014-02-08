@@ -245,7 +245,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
      * @returns {undefined}
      */
     this.moveSlice = function(_sliceId,_topNum,_leftNum){
-            alert("_offsetX");
         var slice = this.getSliceById(_sliceId);
         slice._moveSlice(_topNum,_leftNum);
 //        slice.style.zIndex = 1;
@@ -580,14 +579,11 @@ Pie.prototype = {
         else {
             var sliceHtml = this._createBigSlice(_percentageInt, _percentageStartInt, _colorString);
         }
-//        alert(slice.style.top);
         sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
         sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
         if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
-            alert("isOffset");
             sliceHtml.style.zIndex += 1;
         }
-//        alert(slice.style.top);
         return sliceHtml;
     },
     /**
