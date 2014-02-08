@@ -2,7 +2,7 @@ css-pie (Object Oriented)
 =======
 
 A JavaScript Library that allows you to create a dynamic CSS3 Pie Chart anywhere on your webpage. Pure CSS results or JS Object possible depending on your needs.
-For the original Script see https://github.com/AliBassam/css-pie
+For the original, much smaller and therefore faster Script see https://github.com/AliBassam/css-pie
 
 
 The Object Oriented Version lets you create and handle Pie-Objects 
