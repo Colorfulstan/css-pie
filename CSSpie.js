@@ -250,10 +250,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
 //        slice.style.zIndex = 1;
         this.update();
     };
-//    this.offsetSlice= function(_slice,_valueInt){
-//        _slice._offset(_valueInt);
-//        this.update();
-//    };
+    /**
+     * Method moves the slice away from the middle by the given value
+     * movingVector = anglehalfing of startdegree + enddegree
+     * @param {type} _slice - slice to move
+     * @param {type} _valueInt - value to move it away from the middle
+     * @returns {undefined}
+     */
+    this.offsetSlice= function(_slice,_valueInt){
+        _slice._offset(_valueInt);
+        this.update();
+    };
 
     // inner-Object Slice //////////
     /** Object representation of a slice of the pie
@@ -282,9 +289,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         };
         var _offsetX = 0;
         var _offsetY = 0;
-//        this.isOffset = function(){
-//            return (_offsetX === 0 && _offsetY === 0);
-//        };
         var _percentageCovered = _percentageInt;
         this.percentageSize = function(){
             return _percentageCovered;
@@ -334,109 +338,64 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _offsetY += _topNum;
         };
         // WIP TODO
-//        this._offset = function(_offsetToMiddleInt){
-//            var percentageMid = (this.percentageStart() + this.percentageEnd()) / 2;
-//            if (percentageMid % 100 === 0){
-//                percentageMid /= 100;
-//            } else {
-//                percentageMid = percentageMid % 100;
-//            }
+        this._offset = function(_offsetToMiddleInt){
+            ////////// 
+//            var percentageMid = this.percentageEnd();
+            var percentageMid = (this.percentageStart() + this.percentageEnd()) / 2;
+            if (percentageMid % 100 === 0){
+                percentageMid /= 100;
+            } else {
+                percentageMid = percentageMid % 100;
+            }
 //            alert("percentageMid = " + percentageMid); // DEBUG INFO
-//                alert(this.percentageStart());
-//                alert(this.percentageEnd());
-//            
-//            if (percentageMid < 25){
-//                // first quadrant
-//
-//                var vectorX = 0;
-//                var vectorY = 0;
-//                
-//                // calculating vector through triangle
-//                var degree = pie.percentageToDegree(percentageMid);
+            // Use triangle/angle between movingvector and y-axis
+                var vectorX = 0;
+                var vectorY = 0;
+                
+                // calculating vector through triangle
+                var degree = pie.percentageToDegree(percentageMid);
+                var rad = pie.percentageToRadiant(percentageMid);
+//                alert("sin(rad" + Math.sin(rad));
+//                alert("cos(rad" + Math.cos(rad));
 //                degree = 90 - degree; // 90 = x-axis | angle between x-axis and mid of degrees from slice
-//                alert("degree in 1. quadrant= " + degree); // DEBUG INFO 
-//                
-//                var hypo = (pie.size()/2); // Point on circle / mid if degrees from slice / searched vector
+//                alert("degree btwn x-axis and movingvector= " + degree); // DEBUG INFO 
+                
+                var hypo = (pie.size()/2); // Point on circle / mid if degrees from slice / searched vector
 //                var cos = Math.abs(Math.cos(degree));
 //                var sin = Math.abs(Math.sin(degree));
+                var cos = Math.cos(rad);
+                var sin = Math.sin(rad);
+                ////// Probe /////////////
+                // sin = gegenkathete / Hypotenuse
+                // gegenkathete = Hypo * sin
+                vectorX = hypo * sin;
+//                alert("vectorX= " + vectorX);
+                
+                // cos = ankathete / Hypothenuse
+                // ankathete = Hypo * cos
+                vectorY = hypo * cos;
+//                alert("vectorY= " + vectorY);
+                ///////////////////////////
+                
+                
+                // geradengleichung für Offset
+//                var m = vectorY / vectorX;
+//                var b = _offsetY;
+                // y = mx + b
+                // mx = y - b
+                // x = (y-b) / m
+                // 
+                var vectorMoveX = 0.0;
+                var vectorMoveY = 0.0;
+                    vectorMoveX = (_offsetToMiddleInt * sin)/2;
+                    vectorMoveY = -(_offsetToMiddleInt * cos)/2;
 //                
-//                // cos = ankathete / Hypothenuse
-//                // ankathete = Hypo * cos
-//                vectorX = hypo * cos;
-//                
-//                // sin = gegenkathete / Hypotenuse
-//                // gegenkathete = Hypo * sin
-//                vectorY = hypo * sin;
-//                
-//                // geradengleichung für Offset
-////                var m = vectorY / vectorX;
-////                var b = _offsetY;
-//                // y = mx + b
-//                // mx = y - b
-//                // x = (y-b) / m
-//                // 
-//                var vectorMoveX = (_offsetToMiddleInt * cos);
-//                var vectorMoveY = -(_offsetToMiddleInt * sin)/2;
-//                
-//                alert("vx= " + vectorX);
-//                alert("vy= " + vectorY);
 //                alert("offsetX= " + vectorMoveX);
 //                alert("offsetY= " + vectorMoveY);
-////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
-////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
-////                if (degree > 45){
-////                    _offsetY -= (vectorY);
-////                    _offsetX -= (vectorX);
-////                } else {
-//                _offsetX += (vectorMoveX);
-//                _offsetY += (vectorMoveY);
-////                }
-//            } else if (percentageMid < 50){
-//                // second quadrant
-////                var degree = pie.percentageToDegree(percentageMid);
-////                degree = degree - 90;
-////                alert("degree of movingVector= " + degree);
-////                
-////                var vectorX = 0;
-////                var vectorY = 0;
-////                vectorX = Math.sin(-degree);
-////                vectorY = -Math.cos(degree)*(pie.size()/2);
-////                alert("vx= " + vectorX);
-////                alert("vy= " + vectorY);
-////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
-////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
-////                _offsetY += (vectorY * _offsetToMiddleInt);
-////                _offsetX += (vectorX * _offsetToMiddleInt);
-//                
-//            } else if (percentageMid < 75){
-//                    // third quadrant
-////                    var degree = pie.percentageToDegree(percentageMid);
-//////                    degree = 270 - degree;
-////                    alert("degree of movingVector= " + degree);
-////                
-////                var vectorX = 0;
-////                var vectorY = 0;
-////                vectorX = Math.sin(-degree);
-////                vectorY = Math.cos(degree)*(pie.size());
-////                alert("vx= " + vectorX);
-////                alert("vy= " + vectorY);
-////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
-////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
-////                _offsetY += (vectorY * _offsetToMiddleInt);
-////                _offsetX += (vectorX * _offsetToMiddleInt);
-//            } else {
-//                    // fourth quadrant
-//                
-//            }
-//            // Vektor 1 bestimmen (startDegree)
-//            // Vektor 2 bestimmen (endDegree)
-//            // P1 + P2 berechnen
-//            // G1/2 ? P3
-//            // Vektor 3 bestimmen (0 + r*P3)
-//            // r = _offsetToMiddleInt
-//            // top / left + result of x/y
-////            this.moveBy(x,y);
-//        };
+                _offsetX += (vectorMoveX);
+                _offsetY += (vectorMoveY);
+                
+        };
     };
     Slice.prototype = {
         /**
@@ -695,6 +654,13 @@ Pie.prototype = {
     percentageToDegree: function(_percentageInt) {
         return Math.round(parseFloat((_percentageInt * 180) / 50));
     },
+    /**
+     * Converts percentage value into rad value
+     */
+     percentageToRadiant: function(_percentageInt){
+         var degree = Pie.prototype.percentageToDegree(_percentageInt);
+         return (degree*Math.PI)/180;
+     },
 };
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////               Library - Methods           ////////////////////
