@@ -233,6 +233,24 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         } else
             return 0;
     };
+    /**
+     * Method moves the slice by given values for top/left 
+     * @param {Int} _sliceId - Id of the Slice to be moved
+     * @param {Float} _topNum - Value to move the Slice by
+     * @param {Float} _leftNum - Value to move the Slice by
+     * @returns {undefined}
+     */
+    this.moveSlice = function(_sliceId,_topNum,_leftNum){
+            alert("_offsetX");
+        var slice = this.getSliceById(_sliceId);
+        slice._moveSlice(_topNum,_leftNum);
+//        slice.style.zIndex = 1;
+        this.update();
+    };
+//    this.offsetSlice= function(_slice,_valueInt){
+//        _slice._offset(_valueInt);
+//        this.update();
+//    };
 
     // inner-Object Slice //////////
     /** Object representation of a slice of the pie
@@ -259,6 +277,11 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.newId = function(idInt) {
             _id = idInt;
         };
+        var _offsetX = 0;
+        var _offsetY = 0;
+//        this.isOffset = function(){
+//            return (_offsetX === 0 && _offsetY === 0);
+//        };
         var _percentageCovered = _percentageInt;
         this.percentageSize = function(){
             return _percentageCovered;
@@ -287,10 +310,126 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return (this.previous !== null);
         };
         this.html = function() {
-            return pie.createSlice(_percentageCovered, _percentageStartingAt, _color);
+            return pie.createSlice(_percentageCovered, _percentageStartingAt, _color, _offsetX, _offsetY);
         };
-    }
-    ;
+        /**
+         * 
+         * @type type
+         */
+        /**
+         * Method offsets the slice by given values for top/right
+         * @param {Float} _topNum - Value to move the Slice by
+         * @param {Float} _leftNum - Value to move the Slice by
+         */
+        this._moveSlice = function(_topNum,_leftNum){
+            _offsetX += _leftNum;
+            _offsetY += _topNum;
+        };
+        // WIP TODO
+//        this._offset = function(_offsetToMiddleInt){
+//            var percentageMid = (this.percentageStart() + this.percentageEnd()) / 2;
+//            if (percentageMid % 100 === 0){
+//                percentageMid /= 100;
+//            } else {
+//                percentageMid = percentageMid % 100;
+//            }
+//            alert("percentageMid = " + percentageMid); // DEBUG INFO
+//                alert(this.percentageStart());
+//                alert(this.percentageEnd());
+//            
+//            if (percentageMid < 25){
+//                // first quadrant
+//
+//                var vectorX = 0;
+//                var vectorY = 0;
+//                
+//                // calculating vector through triangle
+//                var degree = pie.percentageToDegree(percentageMid);
+//                degree = 90 - degree; // 90 = x-axis | angle between x-axis and mid of degrees from slice
+//                alert("degree in 1. quadrant= " + degree); // DEBUG INFO 
+//                
+//                var hypo = (pie.size()/2); // Point on circle / mid if degrees from slice / searched vector
+//                var cos = Math.abs(Math.cos(degree));
+//                var sin = Math.abs(Math.sin(degree));
+//                
+//                // cos = ankathete / Hypothenuse
+//                // ankathete = Hypo * cos
+//                vectorX = hypo * cos;
+//                
+//                // sin = gegenkathete / Hypotenuse
+//                // gegenkathete = Hypo * sin
+//                vectorY = hypo * sin;
+//                
+//                // geradengleichung für Offset
+////                var m = vectorY / vectorX;
+////                var b = _offsetY;
+//                // y = mx + b
+//                // mx = y - b
+//                // x = (y-b) / m
+//                // 
+//                var vectorMoveX = (_offsetToMiddleInt * cos);
+//                var vectorMoveY = -(_offsetToMiddleInt * sin)/2;
+//                
+//                alert("vx= " + vectorX);
+//                alert("vy= " + vectorY);
+//                alert("offsetX= " + vectorMoveX);
+//                alert("offsetY= " + vectorMoveY);
+////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
+////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
+////                if (degree > 45){
+////                    _offsetY -= (vectorY);
+////                    _offsetX -= (vectorX);
+////                } else {
+//                _offsetX += (vectorMoveX);
+//                _offsetY += (vectorMoveY);
+////                }
+//            } else if (percentageMid < 50){
+//                // second quadrant
+////                var degree = pie.percentageToDegree(percentageMid);
+////                degree = degree - 90;
+////                alert("degree of movingVector= " + degree);
+////                
+////                var vectorX = 0;
+////                var vectorY = 0;
+////                vectorX = Math.sin(-degree);
+////                vectorY = -Math.cos(degree)*(pie.size()/2);
+////                alert("vx= " + vectorX);
+////                alert("vy= " + vectorY);
+////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
+////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
+////                _offsetY += (vectorY * _offsetToMiddleInt);
+////                _offsetX += (vectorX * _offsetToMiddleInt);
+//                
+//            } else if (percentageMid < 75){
+//                    // third quadrant
+////                    var degree = pie.percentageToDegree(percentageMid);
+//////                    degree = 270 - degree;
+////                    alert("degree of movingVector= " + degree);
+////                
+////                var vectorX = 0;
+////                var vectorY = 0;
+////                vectorX = Math.sin(-degree);
+////                vectorY = Math.cos(degree)*(pie.size());
+////                alert("vx= " + vectorX);
+////                alert("vy= " + vectorY);
+////                alert("new top= currentTop + " + (_offsetToMiddleInt * vectorY));
+////                alert("new left= currentLeft + " + (_offsetToMiddleInt * vectorX));
+////                _offsetY += (vectorY * _offsetToMiddleInt);
+////                _offsetX += (vectorX * _offsetToMiddleInt);
+//            } else {
+//                    // fourth quadrant
+//                
+//            }
+//            // Vektor 1 bestimmen (startDegree)
+//            // Vektor 2 bestimmen (endDegree)
+//            // P1 + P2 berechnen
+//            // G1/2 ? P3
+//            // Vektor 3 bestimmen (0 + r*P3)
+//            // r = _offsetToMiddleInt
+//            // top / left + result of x/y
+////            this.moveBy(x,y);
+//        };
+    };
     Slice.prototype = {
         /**
          * Checks if the calling Slice equals the passed Slice
@@ -425,13 +564,22 @@ Pie.prototype = {
      * @param {String} _colorString color of the slice as String (any legal css colorvalue)
      * @returns {"div"} Slice of the pie
      */
-    createSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+    createSlice: function(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY) {
         if (_percentageInt <= 50) {
-            return this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
+            var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
         }
         else {
-            return this._createBigSlice(_percentageInt, _percentageStartInt, _colorString);
+            var sliceHtml = this._createBigSlice(_percentageInt, _percentageStartInt, _colorString);
         }
+//        alert(slice.style.top);
+        sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
+        sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
+        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
+            alert("isOffset");
+            sliceHtml.style.zIndex += 1;
+        }
+//        alert(slice.style.top);
+        return sliceHtml;
     },
     /**
      * creates Slice of up to 50% value
@@ -472,9 +620,9 @@ Pie.prototype = {
      * @param {String} _colorString color of the slice as String (any legal css colorvalue)
      * @returns {"div"} Container with the big Slice
      */
-    _createBigSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+    _createBigSlice: function(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY) {
         var sliceContainer = document.createElement("div");
-        var nextSlice = this._createSlimSlice(50, _percentageStartInt, _colorString);
+        var nextSlice = this._createSlimSlice(50, _percentageStartInt, _colorString, _offsetX, _offsetY);
         var size = this.size();
         var unit = this.sizeUnit();
         // special clipping for 180° part (gap between two parts)
@@ -483,7 +631,7 @@ Pie.prototype = {
         _percentageInt -= 50;
         _percentageStartInt += 50;
         //remaining part
-        var nextSlice = this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
+        var nextSlice = this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY);
         sliceContainer.appendChild(nextSlice);
         return sliceContainer;
     },
@@ -494,7 +642,7 @@ Pie.prototype = {
         var slice = document.createElement("div");
         slice.style.position = "absolute";
         slice.style.top = "0" + unit;
-        slice.style.left = "0" + unit;
+        slice.style.left = "0" +  unit;
         slice.style.width = sizeString;
         slice.style.height = sizeString;
         slice.style.webkitBorderRadius = sizeString;
