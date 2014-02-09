@@ -272,10 +272,23 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
      * @param {String} _colorStr color of the slice as String (any legal css colorvalue)
      * @returns {Pie.Slice}
      */
-    function Slice(_pie, _percentageInt, _percentageStartInt, _colorStr) {
+    function Slice(_pie, _percentageInt, _percentageStartInt, _backgroundStr) {
         // TODO: handling if SLice wil be inserted between some
         // increasing id of the following slices 
         var pie = _pie;
+        var _background = _backgroundStr;
+        this.setBackground = function(_baseColorOrNull,_imgUrlStrOrNull){
+            if (_baseColorOrNull !== null){
+                _background = _baseColorOrNull;
+            } else if (_imgUrlStrOrNull !== null){
+                _background = _imgUrlStrOrNull;
+            } else {
+                _background = "333";
+            }
+        };
+        this.background = function (){
+            return _background;
+        };
         var _id = 1;
         if (pie.first() !== null) {
             // use id of currentSlice becauseinsertion will always be behind the currentSlice
@@ -306,7 +319,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _percentageStartingAt = _start;
             _percentageEndingAt = _start + _covered;
         };
-        var _color = _colorStr;
         // als linked List/Ring aufbauen?
         this.next = null;
         this.hasNext = function() {
@@ -322,7 +334,7 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          * @returns {HTML} - HTML-Element - HTML-Code of the slice
          */
         this.html = function() {
-            return pie.createSlice(_percentageCovered, _percentageStartingAt, _color, _offsetX, _offsetY);
+            return pie.createSlice(_percentageCovered, _percentageStartingAt, _background, _offsetX, _offsetY);
         };
         /**
          * 
@@ -531,12 +543,39 @@ Pie.prototype = {
      * @param {String} _colorString color of the slice as String (any legal css colorvalue)
      * @returns {"div"} Slice of the pie
      */
-    createSlice: function(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY) {
+    createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr, _offsetX, _offsetY) {
+        var sliceHtml = this._createSlice(_percentageInt, _percentageStartInt, _backgroundStr);
+        sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
+        sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
+        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
+            sliceHtml.style.zIndex += 1;
+        }
+        return sliceHtml;
+    },
+    createSliceImg: function(_percentageInt, _percentageStartInt, _imgURLStr, _offsetX, _offsetY){
+        // TODO WIP
+        
+    },
+            
+    createSliceLink: function(_percentageInt, _percentageStartInt, _linkURLStr, _basecolorStr, _offsetX, _offsetY){
+        // TODO WIP
+//        var sliceLink = document.createElement("a");
+//        var sliceHtml = this._createSlice(_percentageInt, _percentageStartInt, true, _basecolorStr, null);
+//        sliceLink.appendChild(sliceHtml);
+//                
+//        sliceLink.style.top = _offsetY + "" + this.sizeUnit();
+//        sliceLink.style.left = _offsetX + "" + this.sizeUnit();
+//        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
+//            sliceLink.style.zIndex += 1;
+//        }
+//        return sliceLink;
+    },
+    _createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr, _offsetX, _offsetY) {
         if (_percentageInt <= 50) {
-            var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString);
+            var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _backgroundStr);
         }
         else {
-            var sliceHtml = this._createBigSlice(_percentageInt, _percentageStartInt, _colorString);
+            var sliceHtml = this._createBigSlice(_percentageInt, _percentageStartInt, _backgroundStr);
         }
         sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
         sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
@@ -552,7 +591,7 @@ Pie.prototype = {
      * @param {String} _colorString color of the slice as String (any legal css colorvalue)
      * @returns {"div"} Container with the big Slice
      */
-    _createSlimSlice: function(_percentageInt, _percentageStartInt, _colorString) {
+    _createSlimSlice: function(_percentageInt, _percentageStartInt, _backgroundStr) {
         var degree = this.percentageToDegree(_percentageInt);
         var startDegree = this.percentageToDegree(_percentageStartInt);
         //New Slice
@@ -568,7 +607,7 @@ Pie.prototype = {
         }
 
         //New Slice Fill
-        var sliceFill = this._createSliceFill(_colorString);
+        var sliceFill = this._createSliceFill(_backgroundStr);
         sliceFill = this.rotateSlice(sliceFill, degree);
         sliceHtml.appendChild(sliceFill);
         sliceHtml = this.rotateSlice(sliceHtml, startDegree);
@@ -615,12 +654,17 @@ Pie.prototype = {
         sliceHtml.style.clip = "rect(0" + unit + "," + sizeString + "," + sizeString + "," + ((size) / 2) + unit + ")";
         return sliceHtml;
     },
-    _createSliceFill: function(_colorString) {
+    _createSliceFill: function(_backgroundStr) {
         var size = this.size();
         var unit = this.sizeUnit();
         var sizeString = this.sizeString();
         var fillHtml = document.createElement("div");
-        fillHtml.style.backgroundColor = _colorString;
+        // identify background
+        if(_backgroundStr.indexOf("url")  === 0){ // if it starts with "url(...)" its an image
+            fillHtml.style.backgroundImage = _backgroundStr;
+        } else { // it is a color
+        fillHtml.style.backgroundColor = _backgroundStr;
+        }
         fillHtml.style.position = "absolute";
         fillHtml.style.top = "0" + unit;
         fillHtml.style.left = "0" + unit;
