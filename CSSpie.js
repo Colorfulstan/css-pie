@@ -203,6 +203,31 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
              this.container().removeChild(this.container().firstChild);
          }
      };
+     /**
+      * Groups given slices together 
+      * Doesnt affect any references of the pie
+      * Contains Array with the slices it contains
+      * @param {type} _slicesArray - Array with all Slices to group up
+      * @returns {Pie.Slicegroup}
+      */
+     // TODO testing
+     this.createSlicegroup = function(_slicesArray){
+         return new Slicegroup(_slicesArray);
+     };
+     this.moveSlicegroup = function(_sliceIdInGroupInt, _offsetX, _offsetY){
+        // TODO
+        // loop all slices in group
+            // set same offset for all
+         this.upupdate();
+     };
+     this.offsetSlicegroup = function(_sliceIdInGroupInt,_offsetValue){
+         // TODO
+         // get effective percentages start/end
+         // loop through slices of the group
+                // set same offset for each
+         this.upupdate();
+     };
+     
     // WIP /////////////////////////
     this.update = function() {
         var it = this.iterator();
@@ -280,10 +305,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.setBackground = function(_baseColorOrNull,_imgUrlStrOrNull){
             if (_baseColorOrNull !== null){
                 _background = _baseColorOrNull;
-            } else if (_imgUrlStrOrNull !== null){
-                _background = _imgUrlStrOrNull;
-            } else {
-                _background = "333";
             }
         };
         this.background = function (){
@@ -493,6 +514,24 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             }
             return this;
         }
+    };
+    // TODO testing
+    // how to define SLicegroup as a SLice? (extends, vererbung)
+    function Slicegroup(_sliceArray){
+        this.slices = [];
+        for (var i = 0; i < _sliceArray.length; i++){
+            this.slices.push(_sliceArray[i]);
+        };
+        this.slice = function(_sliceIndexInt){
+            if (_sliceIndexInt < _sliceArray.length){
+                return slices[_sliceIndexInt];
+            }
+            else return null;
+        };
+        this.offsetSlicegroup = function(){
+            // TODO code
+        };
+        
     };
     ;
     /////////////////////////////////////////////////////////////////////////////////
