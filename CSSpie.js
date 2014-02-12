@@ -198,34 +198,92 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             current = it.next();
         }
     };
-     this.dropSlices= function(){
-         while (this.container().hasChildNodes()){
-             this.container().removeChild(this.container().firstChild);
+    this.dropSlices= function(){
+        while (this.container().hasChildNodes()){
+            this.container().removeChild(this.container().firstChild);
+        }
+    };
+    this.slicegroups = [];
+    this.isSlicegroupIdValid = function(_slicegroupInt){
+        if (_slicegroupInt <= 0){
+           alert("slicegroupId is <= 0 and invalid"); // DEBUGG Info
+           return false;
+       }
+       if (this.slicegroups.length < _slicegroupInt){
+           alert("slicegroups.length <= _slicegroupIdInt - slicegroup Number " + _slicegroupInt + "doesnt exist"); // DEBUGG Info
+           return false;
+       }
+       else {
+           return true;
+       }
+    };
+    /**
+     * 
+     * @param {type} _fromSliceIdInt first Slice (lowest id) to include in the group
+     * @param {type} _toSliceIdInt last Slice (highest id) to include in the group
+     * @returns {Integer} - returns groupId of the created group
+     */
+    this.groupSlices = function(_fromSliceIdInt, _toSliceIdInt){
+        var sliceArray = [];
+        // loop 
+        for (var i = _fromSliceIdInt; i <= _toSliceIdInt; i++){
+           // findSlice
+           sliceArray.push(this.getSliceById(i));// put in array
+        } // end loop
+        var slicegroup = new Slicegroup(this,sliceArray); // create SLciegroup from array
+        this.slicegroups.push(slicegroup);// push into slicegroups Array
+        // return id of Slicegroup
+        console.log("Slicegroup " + slicegroup.id() + " created"); // DEBUG INFO
+       return slicegroup.id();
+    };
+    this.removeSlicegroupContaining = function(_sliceIdInGroupInt){
+         // find group and its index
+         for (var i=0;i<this.slicegroups.length;i++){
+             var currentSG = this.slicegroups[i];
+             if (currentSG.isSliceInGroup(_sliceIdInGroupInt)){
+                // remove it from _slicegroups
+                 this.slicegroups.splice(i,1);
+                 console.log("Slicegroup " + i + " containing Slice " +_sliceIdInGroupInt+" removed"); // DEBUG INFO
+             }
          }
      };
-     /**
-      * Groups given slices together 
-      * Doesnt affect any references of the pie
-      * Contains Array with the slices it contains
-      * @param {type} _slicesArray - Array with all Slices to group up
-      * @returns {Pie.Slicegroup}
-      */
-     // TODO testing
-     this.createSlicegroup = function(_slicesArray){
-         return new Slicegroup(_slicesArray);
+    this.removeSlicegroup = function(_slicegroupInt){
+        // TODO id handling! <= arrayindex
+         if (this.isSlicegroupIdValid(_slicegroupInt)){
+             var index = _slicegroupInt -  1;
+                // remove it from _slicegroups
+                 this.slicegroups.splice(index,1);
+                 console.log("Slicegroup " + _slicegroupInt + " removed"); // DEBUG INFO
+         }
      };
-     this.moveSlicegroup = function(_sliceIdInGroupInt, _offsetX, _offsetY){
-        // TODO
-        // loop all slices in group
-            // set same offset for all
-         this.upupdate();
+    this.moveSlicegroup = function(_slicegroupInt, _offsetX, _offsetY){
+        if (this.isSlicegroupIdValid(_slicegroupInt)){
+            var slicegroup = this.slicegroups[_slicegroupInt-1];
+            slicegroup.moveSlicegroup(_offsetX, _offsetY);
+            this.update();
+        }
      };
-     this.offsetSlicegroup = function(_sliceIdInGroupInt,_offsetValue){
+    this.offsetSlicegroup = function(_slicegroupInt,_offsetValue){
          // TODO
-         // get effective percentages start/end
-         // loop through slices of the group
-                // set same offset for each
-         this.upupdate();
+         var slicegroup = this.getSlicegroupById(_slicegroupInt);
+         slicegroup.offsetSlicegroup(_offsetValue);
+         this.update();
+     };
+    this.getSlicegroupById = function(_slicegroupIdInt){
+         if (this.slicegroups.length !== 0){
+            return this.slicegroups[_slicegroupIdInt - 1];
+        } else {
+            return null;
+        }
+     };
+    this.findSlicegroupContaining = function(_sliceIdInGroupInt){
+         for (var i=0;i<this.slicegroups.length;i++){
+             var currentSG = this.slicegroups[i];
+             if (currentSG.isSliceInGroup(_sliceIdInGroupInt)){
+                 return currentSG;
+             }
+         }
+         return null;
      };
      
     // WIP /////////////////////////
@@ -282,8 +340,9 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
      * @param {type} _valueInt - value to move it away from the middle
      * @returns {undefined}
      */
-    this.offsetSlice= function(_slice,_valueInt){
-        _slice._offset(_valueInt);
+    this.offsetSlice= function(_sliceIdInt,_valueInt){
+        var slice = this.getSliceById(_sliceIdInt);
+        slice._offset(_valueInt);
         this.update();
     };
 
@@ -301,6 +360,9 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         // TODO: handling if SLice wil be inserted between some
         // increasing id of the following slices 
         var pie = _pie;
+//        this.pie = function(){
+//            return pie;
+//        };
         var _background = _backgroundStr;
         this.setBackground = function(_baseColorOrNull,_imgUrlStrOrNull){
             if (_baseColorOrNull !== null){
@@ -370,30 +432,12 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _offsetX += _leftNum;
             _offsetY += _topNum;
         };
-        // WIP TODO
         this._offset = function(_offsetToMiddleInt){
-            ////////// 
-//            var percentageMid = this.percentageEnd();
             var percentageMid = (this.percentageStart() + this.percentageEnd()) / 2;
-            if (percentageMid % 100 === 0){
-                percentageMid /= 100;
-            } else {
-                percentageMid = percentageMid % 100;
-            }
-//            alert("percentageMid = " + percentageMid); // DEBUG INFO
-            // Use triangle/angle between movingvector and y-axis
-                var vectorX = 0;
-                var vectorY = 0;
-                
                 // calculating vector through triangle
                 var degree = pie.percentageToDegree(percentageMid);
                 var rad = pie.percentageToRadiant(percentageMid);
-//                alert("sin(rad" + Math.sin(rad));
-//                alert("cos(rad" + Math.cos(rad));
-//                degree = 90 - degree; // 90 = x-axis | angle between x-axis and mid of degrees from slice
-//                alert("degree btwn x-axis and movingvector= " + degree); // DEBUG INFO 
-                
-                var hypo = (pie.size()/2); // Point on circle / mid if degrees from slice / searched vector
+//                var hypo = (pie.size()/2); // Point on circle / mid if degrees from slice / searched vector
 //                var cos = Math.abs(Math.cos(degree));
 //                var sin = Math.abs(Math.sin(degree));
                 var cos = Math.cos(rad);
@@ -401,33 +445,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
                 ////// Probe /////////////
                 // sin = gegenkathete / Hypotenuse
                 // gegenkathete = Hypo * sin
-                vectorX = hypo * sin;
+//                vectorX = hypo * sin;
 //                alert("vectorX= " + vectorX);
-                
                 // cos = ankathete / Hypothenuse
                 // ankathete = Hypo * cos
-                vectorY = hypo * cos;
+//                vectorY = hypo * cos;
 //                alert("vectorY= " + vectorY);
-                ///////////////////////////
-                
-                
-                // geradengleichung für Offset
-//                var m = vectorY / vectorX;
-//                var b = _offsetY;
-                // y = mx + b
-                // mx = y - b
-                // x = (y-b) / m
-                // 
                 var vectorMoveX = 0.0;
                 var vectorMoveY = 0.0;
                     vectorMoveX = (_offsetToMiddleInt * sin)/2;
                     vectorMoveY = -(_offsetToMiddleInt * cos)/2;
-//                
-//                alert("offsetX= " + vectorMoveX);
-//                alert("offsetY= " + vectorMoveY);
-                _offsetX += (vectorMoveX);
-                _offsetY += (vectorMoveY);
-                
+                this._moveSlice(vectorMoveY, vectorMoveX);
         };
     };
     Slice.prototype = {
@@ -517,19 +545,59 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
     };
     // TODO testing
     // how to define SLicegroup as a SLice? (extends, vererbung)
-    function Slicegroup(_sliceArray){
+    function Slicegroup(_pie,_sliceArray){
+        var _groupId;
+        ///// Constructor /////////////////////////////////////////////////////////////////////////////////
+        if (_sliceArray.length !== 0){
+            var pie = _pie;
+            _groupId = pie.slicegroups.length + 1;
+        } else {
+            var pie = null;
+        }
+        this.id=function(){
+            return _groupId;
+        };
         this.slices = [];
         for (var i = 0; i < _sliceArray.length; i++){
+//            console.log("slice pushed in group: " + _sliceArray[i].id()); // DEBUGG INFO
             this.slices.push(_sliceArray[i]);
         };
+        ///////////////////////////////////////////////////////////////////////////////////////////////////
         this.slice = function(_sliceIndexInt){
+            // TODO automatic ordering of the given slices by id
             if (_sliceIndexInt < _sliceArray.length){
                 return slices[_sliceIndexInt];
             }
             else return null;
         };
-        this.offsetSlicegroup = function(){
-            // TODO code
+        this.moveSlicegroup = function(_offsetX, _offsetY){
+            for (var i = 0; i< this.slices.length; i++){
+                this.slices[i]._moveSlice(_offsetX, _offsetY);
+                console.log("moved slices: "+ this.slices[i].id()); // debugg
+            };
+        };
+        this.offsetSlicegroup = function(_offsetValueNum){
+        var percentageMid = (this.slices[0].percentageStart() + this.slices[(this.slices.length-1)].percentageEnd()) / 2;
+                // calculating vector through triangle
+                var degree = pie.percentageToDegree(percentageMid);
+                var rad = pie.percentageToRadiant(percentageMid);
+                var cos = Math.cos(rad);
+                var sin = Math.sin(rad);
+                var vectorMoveX = 0.0;
+                var vectorMoveY = 0.0;
+                    vectorMoveX = (_offsetValueNum * sin)/2;
+                    vectorMoveY = -(_offsetValueNum * cos)/2;
+              this.moveSlicegroup(vectorMoveY, vectorMoveX);
+                
+        };
+        this.isSliceInGroup = function(_sliceIdInt){
+            var found = false;
+            for (var i = 0; i< this.slices.length; i++){
+                if (this.slices[i].id() === _sliceIdInt){
+                    found = true;
+                }
+            }
+            return found;
         };
         
     };
