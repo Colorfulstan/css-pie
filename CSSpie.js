@@ -21,9 +21,6 @@
                 github.com/Colorfulstan/css-pie
                 jonas.krispin@fh-duesseldorf.de
  
- Usage of the Pie:
- - create Pie-Object with neccessarry Parameters
- - let this object create its slices etc.
  
  
  Known Issues:
@@ -31,23 +28,40 @@
  - % values as size not supported
  */
 
-
-//Pie Objekt ---------------------------------------------------------------
-function Pie(_id_String, _sizeStr, _basecolorStr) {
-    ////////////////////// THE PIE FOUNDATION //////////////////////////////
-    // ID
-    var _id = _id_String;
-    this.id =
-            function() {
-                return _id;
-            };
-    //////////////////////////////////
-
-    //size   
-    var _size = (function(sizeStr) {
-        return parseFloat(sizeStr);
-    })(_sizeStr); // return von anonymer Funktion als Wert
-    var _sizeUnit = (function(sizeString) {
+/**
+ * Pie Object contains of a background-circle and its slices. At Object-creation, a 
+ * background with given color and of given size and unit is created. The pie
+ * has the given id which equals the html-tag "id" in the produced html code.
+ * The Object offers methods for creating, deleting and manipulating Slices
+ * and delivering the pie as pure HTML/CSS Element.
+ * 
+ * The Pie Object is designed as Linked-List of Slices so it allows to navigate 
+ * through the Slices via the traditional Linked-List Methods. It also allows to
+ * create an Iterator through .iterator() to navigate over an independent set of 
+ * cursors.
+ * 
+ * See <TODO: insert URL> for details on the methods.
+ * @param {type} _idStr
+ *                              String which will be used as "id" tag for the HTML-wrapper-div of the pie
+ * @param {type} _sizeStr
+ *                              Size of the Pie as String with unit.
+ *                              % as unit is currently not supported.
+ *                              TODO: integrate % support
+ * @param {type} _basecolorStr
+ *                              Any legal CSS Color as String for the background-color of the pie-circle
+ * @returns {Pie}
+ */
+function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
+    /////////////////////////////////////////////////////////////////
+    ////////////////////// Constructor //////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    // ID //////////////////////////////////
+    var _id = _idStr;
+    this.id = function() { return _id; };
+    // size ////////////////////////////////
+//    var _size = (function(sizeStr) { return parseFloat(sizeStr);})(_sizeStr); // return of anonymous function as value
+    var _size = parseFloat(_sizeStr);
+    var _sizeUnit = (function(sizeString) { // function START //////////////////
         // trim spaces and remove the _size chars from it = unit
         var unit = sizeString.replace(("" + _size), "");
         unit = String.trim(unit);
@@ -56,67 +70,72 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         // set size for the container in addition or at least a parent element on
         // the site with a set width/height to scale off of
         if (unit === '%') {
-            alert("Pie:'" + _id + "' uses % values\n" + "These are not supported by CSSPie.js yet!\n" + "We'll use px instead for now\n" + "Please Inform your Webmaster.");
+            alert("Pie:'" + _id + 
+                    "' uses % values\n" + 
+                    "These are not supported by CSSPie.js yet!\n" + 
+                    "We'll use px instead for now\n" + 
+                    "Please Inform your Webmaster.");
             return "px";
         }
         return unit;
-    })(_sizeStr);
-    this.size = function() {
-        return _size;
-    };
-    this.sizeUnit = function() {
-        return _sizeUnit;
-    };
-    this.sizeString = function() {
-        return ("" + _size + _sizeUnit);
-    };
-    /////////////////////////////
-
-    // pieContainer - background of the pie and container for the slices
+    })(_sizeStr); // return of anonymous function as value
+        // function END //////////////////////////////////////////////
+    this.size = function() { return _size; };
+    this.sizeUnit = function() { return _sizeUnit; };
+    this.sizeString = function() { return ( "" + _size + _sizeUnit); };
+    // pieContainer - background of the pie and container for the slices ///////
     var pieBackground = this._createBackground(_basecolorStr);
-    this.container = function() {
-        return pieBackground;
-    };
-    //Pie Wrapper - the wrapping div of the resulting pie
-    var pieWrapper = document.createElement("div");
-    pieWrapper.id = _id;
-    pieWrapper.style.display = "inline-block";
-    pieWrapper.appendChild(pieBackground);
-    this.wrapper = function() {
-        return pieWrapper;
-    };
-    ////////////////////// ////////////////////// //////////////////////////////
-    ////////////////////// Slice Management //////////////////////////////
+    this.container = function() { return pieBackground; };
+    //Pie HTML - the wrapping div of the resulting pie therefore the HTML of the pie
+    var pieHTML = document.createElement("div");
+    pieHTML.id = _id;
+    pieHTML.style.display = "inline-block";
+    pieHTML.appendChild(pieBackground);
+    /**
+     * Method returns the HTML-code to be appended to the body or other elements on the site
+     * @returns {HTML} 
+     *                  HTML-Element of the pie
+     */
+    this.html = function() { return pieHTML; };
+    /////////////////////////////////////////////////////////////////
+    ////////////////////// End Constructor //////////////////////////
+    /////////////////////////////////////////////////////////////////
+    //-------------------------------------------------------------//
+    /////////////////////////////////////////////////////////////////
+    ////////////////////// Slice Management //////////////////////////
+    /////////////////////////////////////////////////////////////////
     var _startingPercentage = 0;
-    this.firstPercentage = function(){
-        return _startingPercentage;
-    };
-    // Each Slice holds it own percentage
-    // Pie handles references on Slices (Linked List)
-    // if new slice is added, pie gets created newly!?
+    this.firstPercentage = function(){ return _startingPercentage; };
     var _firstSlice = null;
-    this.first = function() {
-        return _firstSlice;
-    };
+    this.first = function() { return _firstSlice; };
     var _lastSlice = null;
-    this.last = function() {
-        return _lastSlice;
-    };
+    this.last = function() { return _lastSlice; };
     var _currentSlice = null;
-    this.current = function() {
-        return _currentSlice;
-    };
-    // REVISION: linking it as list atm, should link it as circle?
+    this.current = function() { return _currentSlice; };
+    // Navigation //////////////////////////////////////////////////
+    /**
+     * Method returns the next Slice to the current one or it returns the 
+     * current Slice if its the last Slice. 
+     * Sets the cursor of the Pie for currentSlice on the Slice returned.
+     * @returns {Slice}
+     *                  next Slice or currentSlice if thats the last one
+     */
     this.next = function() {
-        if (!_currentSlice.equal(_lastSlice)) {
+        if (!_currentSlice.equals(_lastSlice)) {
             _currentSlice = _currentSlice.next;
             return _currentSlice;
         }
-        else
-            return _currentSlice;
+        else {return _currentSlice;}
     };
+    /**
+     * Method returns the previous Slice to the current one or it returns the 
+     * current Slice if its the first Slice. 
+     * Sets the cursor of the Pie for currentSlice on the Slice returned.
+     * @returns {Slice}
+     *                  next Slice or currentSlice if thats the last one
+     */
     this.previous = function() {
-        if (!_currentSlice.equal(_firstSlice)) {
+        if (!_currentSlice.equals(_firstSlice)) {
             _currentSlice = _currentSlice.previous;
             return _currentSlice;
         }
@@ -124,18 +143,14 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return _currentSlice;
     };
     this.hasNext = function() {
-        if (!_currentSlice.equal(this.next()))
-            return true;
-        else
-            return false;
+        if (!_currentSlice.equals(this.next())) {return true; }
+        else {return false;}
     };
     this.hasPrevious = function() {
-        if (!_currentSlice.equal(this.previous()))
-            return true;
-        else
-            return false;
-    };
-    // 
+        if (!_currentSlice.equals(this.previous())){ return true; }
+        else { return false; }
+    }; 
+    /////////////////////////////////////////////////////////////////
     /**
      * Adds a Slice after possibly existing Slices and moves Cursor to the new slice
      * @param {Int} _percentageInt 
@@ -162,11 +177,15 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.container().appendChild(newSlice.html());
         return _currentSlice;
     };
-    
     /**
      * Removes a slice from the pie and updates its html.
+     * Remaining Slices will adapt there position on the pie to fill the gap.
+     * if the removed Slice is the currentSlice of the pie, that Cursor will
+     * be set onto the firstSlice
+     * 
      * @param {type} _sliceIdToRemove
-     * @returns {undefined}
+     *                                  Id of the Slice to remove
+     * @return {Boolean} true if a Slice got removed
      */
     this.removeSlice = function(_sliceIdToRemove){
         // find Slice
@@ -174,23 +193,56 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         // If Slice was found
         if (needle !== null){
             needle._removeFromLinks();
-            if (needle.equal(_firstSlice)){
+            if (needle.equals(_firstSlice)){
                 _firstSlice = needle.next;
             }
-            if (needle.equal(_lastSlice)){
+            if (needle.equals(_lastSlice)){
                 _lastSlice = needle.previous;
             }
-            if (needle.equal(_currentSlice)){
-                _currentSlice = null;
+            if (needle.equals(_currentSlice)){
+                _currentSlice = _firstSlice;
             }
             this.update();
+            return true;
         }
+        return false;
     };
-
+    /**
+     * searches for the slice with given id and returns it if found.
+     * @param {type} _indexOfSliceInt
+     * @returns {Slice} - Slice with the given id or null if not found
+     */
     this.getSliceById = function(_indexOfSliceInt) {
-        return this.first()._findId(_indexOfSliceInt);
+        return this.first()._findSlice(_indexOfSliceInt);
     };
-    this.drawSlices = function(){
+    /**
+     * Method moves the slice by given values for top/left 
+     * @param {Int} _sliceId - Id of the Slice to be moved
+     * @param {Float} _topNum - Value to move the Slice by
+     * @param {Float} _leftNum - Value to move the Slice by
+     * @returns {undefined}
+     */
+    this.moveSlice = function(_sliceId,_topNum,_leftNum){
+        var slice = this.getSliceById(_sliceId);
+        slice._moveSlice(_topNum,_leftNum);
+        this.update();
+    };
+    /**
+     * Method moves the slice away from the middle by the given value
+     * movingVector = anglehalfing of startdegree + enddegree
+     * @param {type} _sliceIdInt - Id of the slice to move
+     * @param {type} _valueInt - value to move it away from the middle
+     * @returns {undefined}
+     */
+    this.offsetSlice= function(_sliceIdInt,_valueInt){
+        var slice = this.getSliceById(_sliceIdInt);
+        slice._offset(_valueInt);
+        this.update();
+    };
+    /**
+     * Appends the HTML off all the Slices to this.container()
+     */
+    this._drawSlices = function(){
         var it = this.iterator();
         var current = it.first();
         while(current !== null){
@@ -198,18 +250,37 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             current = it.next();
         }
     };
+    /**
+     * Removes all Slices from container
+     */
     this.dropSlices= function(){
         while (this.container().hasChildNodes()){
             this.container().removeChild(this.container().firstChild);
         }
     };
+    /////////////////////////////////////////////////////////////////
+    ////////////////////// Slicegroups //////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    // TODO: Slices should contain their group? REVISION
     this.slicegroups = [];
+    /**
+     * Checks if the given number of a slicegroup is valid.
+     * 
+     * Conditions:
+     * - Number < 0 
+     * - Number > number of slicegroups
+     * 
+     * @param {type} _slicegroupInt
+     *                              number of the slice group to check
+     * @returns {Boolean}
+     *                              true if the slicegroup exists
+     */
     this.isSlicegroupIdValid = function(_slicegroupInt){
-        if (_slicegroupInt <= 0){
+       if (_slicegroupInt <= 0){
            alert("slicegroupId is <= 0 and invalid"); // DEBUGG Info
            return false;
        }
-       if (this.slicegroups.length < _slicegroupInt){
+       if (_slicegroupInt > this.slicegroups.length){
            alert("slicegroups.length <= _slicegroupIdInt - slicegroup Number " + _slicegroupInt + "doesnt exist"); // DEBUGG Info
            return false;
        }
@@ -218,10 +289,13 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
        }
     };
     /**
-     * 
-     * @param {type} _fromSliceIdInt first Slice (lowest id) to include in the group
-     * @param {type} _toSliceIdInt last Slice (highest id) to include in the group
-     * @returns {Integer} - returns groupId of the created group
+     * Groups Slices together and returns an Slicegroup Object.
+     * @param {type} _fromSliceIdInt 
+     *                                  first Slice (lowest id) to include in the group
+     * @param {type} _toSliceIdInt 
+     *                                  last Slice (highest id) to include in the group
+     * @returns {Slicegroup} 
+     *                                  the created Slicegroup Object
      */
     this.groupSlices = function(_fromSliceIdInt, _toSliceIdInt){
         var sliceArray = [];
@@ -234,9 +308,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.slicegroups.push(slicegroup);// push into slicegroups Array
         // return id of Slicegroup
         console.log("Slicegroup " + slicegroup.id() + " created"); // DEBUG INFO
-       return slicegroup.id();
+       return slicegroup;
     };
-    this.removeSlicegroupContaining = function(_sliceIdInGroupInt){
+    /**
+     * Finds the Slicegroup that contains the Slice with the given id
+     * and ungroups it elements by removing the group-reference from 
+     * the Slicegroups Array
+     * 
+     * @param {type} _sliceIdInGroupInt
+     *                                  Id of a Slice in the group that should be deleted
+     */
+    this.ungroupSlicegroupContaining = function(_sliceIdInGroupInt){
          // find group and its index
          for (var i=0;i<this.slicegroups.length;i++){
              var currentSG = this.slicegroups[i];
@@ -247,7 +329,14 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
              }
          }
      };
-    this.removeSlicegroup = function(_slicegroupInt){
+    /**
+     * 
+     * Ungroups the elements of the n-th Slicegroup, where n = the given value.
+     * It does that by removing the group-reference from the Slicegroups Array
+     * @param {type} _slicegroupInt
+     *                              Slicegroup to delete (n-th)
+     */
+    this.ungroupSlicegroup = function(_slicegroupInt){
         // TODO id handling! <= arrayindex
          if (this.isSlicegroupIdValid(_slicegroupInt)){
              var index = _slicegroupInt -  1;
@@ -256,6 +345,15 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
                  console.log("Slicegroup " + _slicegroupInt + " removed"); // DEBUG INFO
          }
      };
+    /**
+     * Moves the n-th Slicegroup by the given values and updates the pie.
+     * @param {type} _slicegroupInt
+     *                              Slicegroup to move (n-th)
+     * @param {Float} _offsetX
+     *                              "left"-value to add
+     * @param {Float} _offsetY
+     *                              "top"-value to add
+     */
     this.moveSlicegroup = function(_slicegroupInt, _offsetX, _offsetY){
         if (this.isSlicegroupIdValid(_slicegroupInt)){
             var slicegroup = this.slicegroups[_slicegroupInt-1];
@@ -263,19 +361,45 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             this.update();
         }
      };
+    /**
+     * Moves the n-th Slicegroup by the given value away from the center of the pie.
+     * Moving Vector is half angle between starting Angle of the first and 
+     * Ending Angle of the last Slice within the group.
+     * Updates the pie.
+     * @param {type} _slicegroupInt
+     *                              Slicegroup to move (n-th)
+     * @param {Float} _offsetX
+     *                              "left"-value to add
+     * @param {Float} _offsetY
+     *                              "top"-value to add
+     */
     this.offsetSlicegroup = function(_slicegroupInt,_offsetValue){
          // TODO
          var slicegroup = this.getSlicegroupById(_slicegroupInt);
          slicegroup.offsetSlicegroup(_offsetValue);
          this.update();
      };
-    this.getSlicegroupById = function(_slicegroupIdInt){
-         if (this.slicegroups.length !== 0){
-            return this.slicegroups[_slicegroupIdInt - 1];
-        } else {
-            return null;
-        }
-     };
+    /**
+     * Searches the Slicegroup with the given groupId and returns it if found.
+     * @param {type} _slicegroupIdInt
+     *                                  groupId of the slicegroup to get
+     * @returns {Slicegroup}
+     */
+    // TODO: fix and test (compare ids)
+//    this.getSlicegroupById = function(_slicegroupIdInt){
+//         if (this.slicegroups.length !== 0){
+//            return this.slicegroups[_slicegroupIdInt - 1];
+//        } else {
+//            return null;
+//        }
+//     };
+    /**
+     * Finds the slicegroup that contains the Slice with the given Id and returns it.
+     * Returns null if that group or slice doesnt exist
+     * @param {type} _sliceIdInGroupInt
+     *                                  Id of a Slice within the group to find
+     * @returns {Slicegroup}
+     */
     this.findSlicegroupContaining = function(_sliceIdInGroupInt){
          for (var i=0;i<this.slicegroups.length;i++){
              var currentSG = this.slicegroups[i];
@@ -285,8 +409,19 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          }
          return null;
      };
-     
-    // WIP /////////////////////////
+    /////////////////////////////////////////////////////////////////
+    ////////////////////// END Slicegroups //////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /**
+     * Updates the HTML of the Pie using properties of the slices.
+     * Checks that key-properties are in place
+     * 
+     * 1) Removes all HTML-slices
+     * 2) Checks that ids of the slices start with 1 and increase by 1 each
+     * 3) updates the following slices (id + percentages) if the ids dont match the pattern
+     * 4) adds HTML-slices with updated properties
+     * 
+     */
     this.update = function() {
         var it = this.iterator();
         var current = it.first();
@@ -298,7 +433,7 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             
             // if current Slice is first set its id to 1
             // and make sure its percentages are set right
-            if (current.equal(it.first())) {
+            if (current.equals(it.first())) {
                     current.newId(1);
                     current.setPercentages(this.firstPercentage(),current.percentageSize());
                 }
@@ -307,13 +442,20 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
                 // start from that with updating the following ids
                 current._updateFollowingIds();
             }
+            if (current.hasNext() && current.percentageEnd() !== current.next.percentageStart()){
+                current._updateFollowingPercentages();
+            }
             current = it.next();
         }
         // and update following percentages
-        it.first()._updateFollowingPercentages();
+//        it.first()._updateFollowingPercentages();
         // adding html of Slices
-        this.drawSlices();
+        this._drawSlices();
     };
+    /**
+     * The Number of Slices within the pie
+     * @returns {Integer}
+     */
     this.count = function() {
         if (_lastSlice !== null) {
             return _lastSlice.id();
@@ -321,60 +463,32 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return 0;
     };
     /**
-     * Method moves the slice by given values for top/left 
-     * @param {Int} _sliceId - Id of the Slice to be moved
-     * @param {Float} _topNum - Value to move the Slice by
-     * @param {Float} _leftNum - Value to move the Slice by
-     * @returns {undefined}
+     * Number of slicegroups in this pie
+     * @returns {Integer}
      */
-    this.moveSlice = function(_sliceId,_topNum,_leftNum){
-        var slice = this.getSliceById(_sliceId);
-        slice._moveSlice(_topNum,_leftNum);
-//        slice.style.zIndex = 1;
-        this.update();
+    this.groupCount = function() {
+        return slicegroups.length;
     };
-    /**
-     * Method moves the slice away from the middle by the given value
-     * movingVector = anglehalfing of startdegree + enddegree
-     * @param {type} _slice - slice to move
-     * @param {type} _valueInt - value to move it away from the middle
-     * @returns {undefined}
-     */
-    this.offsetSlice= function(_sliceIdInt,_valueInt){
-        var slice = this.getSliceById(_sliceIdInt);
-        slice._offset(_valueInt);
-        this.update();
-    };
-
+    //-----------------------------------------------------------------------//
     // inner-Object Slice //////////
-    /** Object representation of a slice of the pie
+    /** Object representation of a slice of the pie.
+     * Background will be set to a color if a css color is given or to an image
+     * if an url(..) is given in _backgroundStr.
      * 
      * @param {type} _pie - the pie this slice belongs to
      * @param {Int} _percentageInt 
      *                          value how big the slice will be in percent of the pie
      * @param {Int} _percentageStartInt - value at which the slice starts (0=top mid of circle)
-     * @param {String} _colorStr color of the slice as String (any legal css colorvalue)
+     * @param {String} _backgroundStr - String with either a legal CSS Color or an url(...) to an image
      * @returns {Pie.Slice}
      */
     function Slice(_pie, _percentageInt, _percentageStartInt, _backgroundStr) {
-        // TODO: handling if SLice wil be inserted between some
-        // increasing id of the following slices 
+        // TODO: adding possibility to insertSlice between some others
         var pie = _pie;
-//        this.pie = function(){
-//            return pie;
-//        };
-        var _background = _backgroundStr;
-        this.setBackground = function(_baseColorOrNull,_imgUrlStrOrNull){
-            if (_baseColorOrNull !== null){
-                _background = _baseColorOrNull;
-            }
-        };
-        this.background = function (){
-            return _background;
-        };
+        // ID //////////////////////////
         var _id = 1;
         if (pie.first() !== null) {
-            // use id of currentSlice becauseinsertion will always be behind the currentSlice
+            // use id of currentSlice because insertion will always be behind the currentSlice
             _id = (pie.current().id()) + 1;
         }
         this.id = function() {
@@ -383,6 +497,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
         this.newId = function(idInt) {
             _id = idInt;
         };
+        // BACKGROUND //////////////////
+        var _background = _backgroundStr;
+        this.setBackground = function(_backgroundStr){
+            if (_backgroundStr !== null){
+                _background = _backgroundStr;
+            }
+        };
+        this.background = function (){
+            return _background;
+        };
+        //-------------------------------------------------------------------//
         var _offsetX = 0;
         var _offsetY = 0;
         var _percentageCovered = _percentageInt;
@@ -402,7 +527,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _percentageStartingAt = _start;
             _percentageEndingAt = _start + _covered;
         };
-        // als linked List/Ring aufbauen?
         this.next = null;
         this.hasNext = function() {
             return (this.next !== null);
@@ -420,10 +544,6 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return pie.createSlice(_percentageCovered, _percentageStartingAt, _background, _offsetX, _offsetY);
         };
         /**
-         * 
-         * @type type
-         */
-        /**
          * Method offsets the slice by given values for top/right
          * @param {Float} _topNum - Value to move the Slice by
          * @param {Float} _leftNum - Value to move the Slice by
@@ -432,6 +552,14 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _offsetX += _leftNum;
             _offsetY += _topNum;
         };
+        /**
+         * Moves a Slice away from the center of the circle by the given value.
+         * Moving Vector is the half angle between starting and ending angle/percentage
+         * of the Slice.
+         * 
+         * @param {type} _offsetToMiddleInt
+         *                                  Value to move the Slice by
+         */
         this._offset = function(_offsetToMiddleInt){
             var percentageMid = (this.percentageStart() + this.percentageEnd()) / 2;
                 // calculating vector through triangle
@@ -464,17 +592,14 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          * @param {Slice} _sliceToCompareTo
          * @returns {Boolean}
          */
-        equal: function(_sliceToCompareTo) {
+        equals: function(_sliceToCompareTo) {
             // TODO: more parameters for comparisson and perhaps compare() method
             var equalId = this.id() === _sliceToCompareTo.id();
             if (equalId) {
                 return true;
             }
         },
-        /**
-         * Sets the ids of the SLices in Order which follows to the calling Slice
-         * 
-         */
+        /** updates all ids to be increasing by 1 each slice */
         _updateFollowingIds: function() {
             var next = this.next;
             if (next !== null) {
@@ -484,6 +609,10 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
 //                alert("currently processing: " + this.id()); // DEBUGG INFO
             return;
         },
+        /**
+         * updates all following slices to have their starting percentage
+         * set to the previous ending percentage
+         */
         _updateFollowingPercentages: function(){
             var next = this.next;
             if(next !== null){
@@ -502,7 +631,7 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          * @returns {Boolean} - returns true if Slice is found
          */
         _isSliceInPie: function(_sliceToFind) {
-            if (this.equal(_sliceToFind)) {
+            if (this.equals(_sliceToFind)) {
                 return true;
             }
             var next = this.next;
@@ -517,20 +646,20 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
          * @param {type} _idToFindInt
          * @returns {Pie.Slice.prototype} - returns Slice if found or null if not in Pie
          */
-        _findId: function(_idToFindInt) {
+        _findSlice: function(_idToFindInt) {
             if (this.id() === _idToFindInt) {
 //                alert("found " + this.id());
                 return this;
             } else if (this.next !== null) {
-                return this.next._findId(_idToFindInt);
+                return this.next._findSlice(_idToFindInt);
             }
             return null;
         },
-                /**
-                 * Redirects the references from surrounding Slices to remove
-                 * the calling Slice from the links
-                 * @returns {Pie.Slice.prototype} the removed Slice
-                 */
+        /**
+         * Redirects the references from surrounding Slices to remove
+         * the calling Slice from the links
+         * @returns {Pie.Slice.prototype} the removed Slice
+         */
         _removeFromLinks: function(){
             var previous = this.previous;
             var next = this.next;
@@ -543,41 +672,71 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             return this;
         }
     };
-    // TODO testing
-    // how to define SLicegroup as a SLice? (extends, vererbung)
+    //------------------------------------------------------------------------//
+    // how to define Slicegroup as a Slice? (extends, vererbung)
+    /**
+     * Slicegroup Objects are used to group up slices and use the same 
+     * manipulation on all of them equally.
+     * Slicegroups are not organized as linked Elements, 
+     * so they have to be managed from outside.
+     * 
+     * @param {type} _pie
+     *                              Pie Object that the slicegroup belongs to
+     * @param {type} _sliceArray
+     *                              Array with all Slices to group together
+     *                              !!has to be ordered from lowest id to highest!!
+     * @returns {Pie.Slicegroup}
+     */
     function Slicegroup(_pie,_sliceArray){
+        // TODO: fix the order-dependency of _sliceArray
+        var pie = _pie;
         var _groupId;
-        ///// Constructor /////////////////////////////////////////////////////////////////////////////////
-        if (_sliceArray.length !== 0){
-            var pie = _pie;
-            _groupId = pie.slicegroups.length + 1;
-        } else {
-            var pie = null;
-        }
+        _groupId = pie.slicegroups.length + 1;
         this.id=function(){
             return _groupId;
         };
+        // Slices ///////////////////////////////////////////
         this.slices = [];
         for (var i = 0; i < _sliceArray.length; i++){
 //            console.log("slice pushed in group: " + _sliceArray[i].id()); // DEBUGG INFO
             this.slices.push(_sliceArray[i]);
         };
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        this.slice = function(_sliceIndexInt){
+        /**
+         * Returns the n-th slice within the group.
+         * @param {type} _sliceInt
+         *                          Number of the slice within the group (n-th)
+         * @returns {Slice}
+         */
+        this.slice = function(_sliceInt){
+            var sliceIndexInt = _sliceInt -1;
             // TODO automatic ordering of the given slices by id
-            if (_sliceIndexInt < _sliceArray.length){
-                return slices[_sliceIndexInt];
+            if (sliceIndexInt < _sliceArray.length){
+                return slices[sliceIndexInt];
             }
             else return null;
         };
+        /**
+         * Moves all Slices of the group.
+         * @param {type} _offsetX
+         *                          "left" value to add
+         * @param {type} _offsetY
+         *                          "top" value to add
+         */
         this.moveSlicegroup = function(_offsetX, _offsetY){
             for (var i = 0; i< this.slices.length; i++){
                 this.slices[i]._moveSlice(_offsetX, _offsetY);
                 console.log("moved slices: "+ this.slices[i].id()); // debugg
             };
         };
+        /**
+         * Moves a Slicegroup away from the center of the circle by the given value.
+         * Moving Vector is the half angle between starting and ending angle/percentage
+         * of the Slice.
+         * @param {Float} _offsetValueNum
+         *                                  Value to move the group away from the center
+         */
         this.offsetSlicegroup = function(_offsetValueNum){
-        var percentageMid = (this.slices[0].percentageStart() + this.slices[(this.slices.length-1)].percentageEnd()) / 2;
+                var percentageMid = (this.slices[0].percentageStart() + this.slices[(this.slices.length-1)].percentageEnd()) / 2;
                 // calculating vector through triangle
                 var degree = pie.percentageToDegree(percentageMid);
                 var rad = pie.percentageToRadiant(percentageMid);
@@ -590,6 +749,11 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
               this.moveSlicegroup(vectorMoveY, vectorMoveX);
                 
         };
+        /**
+         * Checks if the Slice with the given id is in this Slicegroup.
+         * @param {type} _sliceIdInt
+         * @returns {Boolean}
+         */
         this.isSliceInGroup = function(_sliceIdInt){
             var found = false;
             for (var i = 0; i< this.slices.length; i++){
@@ -599,10 +763,18 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             }
             return found;
         };
-        
     };
-    ;
     /////////////////////////////////////////////////////////////////////////////////
+    //------------------------------------------------------------------------//
+    /**
+     * Iterator doesnt affect the references within the pie.
+     * If Elements are changed during a loop through multiple iterators 
+     * might lead to unexpected results.
+     * 
+     * Use iterator() to get your Iterator
+     * @param {type} _pie
+     * @returns {Pie.Iterator}
+     */
     function Iterator(_pie) {
         var _currentSlice = _pie.first();
         this.first = function() {
@@ -619,16 +791,17 @@ function Pie(_id_String, _sizeStr, _basecolorStr) {
             _currentSlice = _currentSlice.previous;
             return _currentSlice.previous;
         };
-    }
-    ;
+    };
+    /**
+     * Returns an Iterator for the pie
+     * @returns {Pie.Iterator}
+     */
     this.iterator = function() {
         return new Iterator(this);
     };
-
-}
-
-// Klassenmethoden
-Pie.prototype = {
+}; // Pie END //////////////////////////////////////////////////////////////////
+/** Contains basic Methods neccessary to create a pie and its slices */
+Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
     _createBackground: function(_basecolorStr) {
         var sizeString = this.sizeString();
         var pieBackground = document.createElement("div");
@@ -658,13 +831,8 @@ Pie.prototype = {
             sliceHtml.style.zIndex += 1;
         }
         return sliceHtml;
-    },
-    createSliceImg: function(_percentageInt, _percentageStartInt, _imgURLStr, _offsetX, _offsetY){
-        // TODO WIP
-        
-    },
-            
-    createSliceLink: function(_percentageInt, _percentageStartInt, _linkURLStr, _basecolorStr, _offsetX, _offsetY){
+    },     
+//    createSliceLink: function(_percentageInt, _percentageStartInt, _linkURLStr, _basecolorStr, _offsetX, _offsetY){
         // TODO WIP
 //        var sliceLink = document.createElement("a");
 //        var sliceHtml = this._createSlice(_percentageInt, _percentageStartInt, true, _basecolorStr, null);
@@ -676,7 +844,7 @@ Pie.prototype = {
 //            sliceLink.style.zIndex += 1;
 //        }
 //        return sliceLink;
-    },
+//    },
     _createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr, _offsetX, _offsetY) {
         if (_percentageInt <= 50) {
             var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _backgroundStr);
@@ -812,7 +980,7 @@ Pie.prototype = {
          var degree = Pie.prototype.percentageToDegree(_percentageInt);
          return (degree*Math.PI)/180;
      },
-};
+}; // Pie.prototype END ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 /////////////////               Library - Methods           ////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -862,7 +1030,7 @@ function createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt
  */
 function createPie(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr) {
     var pieContainer = createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentagesIntArr, colorsStrArr);
-    return pieContainer.wrapper();
+    return pieContainer.html();
 }
 /** creates a pie that is equally divided into slices
  * ColorArray gets looped over when too few colors are provided
@@ -897,5 +1065,5 @@ function createEquallyDividedPie(pieNameStr, pieSizeStr, basecolorStr, numberOfS
         pieObject.addSlice(percentPerSlice, percentageUsed, nextColor);
         percentageUsed += percentPerSlice;
     }
-    return pieObject.wrapper();
+    return pieObject.html();
 }
