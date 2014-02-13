@@ -2,12 +2,18 @@ css-pie (Object Oriented)
 =======
 
 A JavaScript Library that allows you to create a dynamic CSS3 Pie Chart anywhere on your webpage. Pure CSS results or JS Object possible depending on your needs.
-For the original, much smaller and therefore faster Script see https://github.com/AliBassam/css-pie
+
+If you only need a plain circle divided into colored sections you should check out https://github.com/AliBassam/css-pie
+for the much smaller original script.
 
 
 The Object Oriented Version lets you create and handle Pie-Objects 
-and comes with handy Methods for creating and deleting single slices.
-More to Come.
+and comes with handy Methods for creating and manipulating slices.
+More to Come...
+
+WIP:
+----
+Demopage for Overview of Pie-object functionalities with examples
 
 -------------------------------------------------------------------
 IF YOU WANT TO CONTRIBUTE:
@@ -25,6 +31,7 @@ IF YOU WANT TO CONTRIBUTE:
 
 Possibly Todo:
 ---------
+- integration of css-classes (HIGH PRIORITY)
 - handling number of slices != number of percentages
 - handling sum of percentages > 100
 - handling slice-movement (should it change size of the wrapping/container?
@@ -36,6 +43,3 @@ Possibly Todo:
 - integration of Captions and labels
 - more options for styling the pie and the slices(.classes perhaps)
 - ...
-
-WIP:
-----
