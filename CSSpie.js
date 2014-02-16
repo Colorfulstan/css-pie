@@ -64,7 +64,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     var _sizeUnit = (function(sizeString) { // function START //////////////////
         // trim spaces and remove the _size chars from it = unit
         var unit = sizeString.replace(("" + _size), "");
-        unit = String.trim(unit);
+        unit = unit.trim();
         // DEBUGG: not supporting % usage atm
         // pie wont show on site but appears in DOM so it seems to need a 
         // set size for the container in addition or at least a parent element on
@@ -84,6 +84,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     this.sizeUnit = function() { return _sizeUnit; };
     this.sizeString = function() { return ( "" + _size + _sizeUnit); };
     // pieContainer - background of the pie and container for the slices ///////
+	// TODO: setBackground() for piecontainer
     var pieBackground = this._createBackground(_basecolorStr);
     this.container = function() { return pieBackground; };
     //Pie HTML - the wrapping div of the resulting pie therefore the HTML of the pie
@@ -155,12 +156,15 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
      * Adds a Slice after possibly existing Slices and moves Cursor to the new slice
      * @param {Int} _percentageInt 
      *                          value how big the slice will be in percent of the pie
-     * @param {Int} _percentageStartInt value at which the slice starts (0=top mid of circle)
-     * @param {String} _colorStr color of the slice as String (any legal css colorvalue)
+     * @param {Int} _percentageStartInt 
+     *                                      value at which the slice starts (0=top mid of circle)
+     *                                      Only relevant if you dont create Pie.update()
+     *                                      Or a single Slice
+     * @param {String} _backgroundStr String with background (any legal css colorvalue or url(...) to image)
      * @returns {Slice} the added, new currentSlice
      */
-    this.addSlice = function(_percentageInt, _percentageStartInt, _colorStr) {
-        var newSlice = new Slice(this, _percentageInt, _percentageStartInt, _colorStr);
+    this.addSlice = function(_percentageInt, _percentageStartInt, _backgroundStr) {
+        var newSlice = new Slice(this, _percentageInt, _percentageStartInt, _backgroundStr);
         //  already existing slices
         if (_firstSlice !== null) {
             _currentSlice.next = newSlice;
@@ -170,11 +174,14 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         }
         // newSLice is first Slice
         else {
+            _startingPercentage = newSlice.percentageStart();
             _firstSlice = newSlice;
             _currentSlice = newSlice;
             _lastSlice = newSlice;
         }
-        this.container().appendChild(newSlice.html());
+//        this.container().appendChild(newSlice.html());
+        this.update();
+        
         return _currentSlice;
     };
     /**
@@ -845,18 +852,18 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
 //        }
 //        return sliceLink;
 //    },
-    _createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr, _offsetX, _offsetY) {
+    _createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr) {
         if (_percentageInt <= 50) {
             var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _backgroundStr);
         }
         else {
             var sliceHtml = this._createBigSlice(_percentageInt, _percentageStartInt, _backgroundStr);
         }
-        sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
-        sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
-        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
-            sliceHtml.style.zIndex += 1;
-        }
+//        sliceHtml.style.top = _offsetY + "" + this.sizeUnit();
+//        sliceHtml.style.left = _offsetX + "" + this.sizeUnit();
+//        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
+//            sliceHtml.style.zIndex += 1;
+//        }
         return sliceHtml;
     },
     /**
@@ -879,6 +886,7 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
             startDegree -= 2;
             // fixes visual glitches somewhat
             // TODO: better method for fixing visual glitch between pie-slices
+            // strong blink at 4 slices [10,10,60,10]
         }
 
         //New Slice Fill
@@ -900,6 +908,7 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
      */
     _createBigSlice: function(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY) {
         var sliceContainer = document.createElement("div");
+        sliceContainer.style.position = "absolute";
         var nextSlice = this._createSlimSlice(50, _percentageStartInt, _colorString, _offsetX, _offsetY);
         var size = this.size();
         var unit = this.sizeUnit();
