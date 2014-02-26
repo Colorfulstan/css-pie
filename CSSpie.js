@@ -107,6 +107,10 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     /////////////////////////////////////////////////////////////////
     var _startingPercentage = 0;
     this.firstPercentage = function(){ return _startingPercentage; };
+    this.setNewStart = function(_newStartingPercentage){
+        _startingPercentage = _newStartingPercentage;
+        this.update();
+    };
     var _firstSlice = null;
     this.first = function() { return _firstSlice; };
     var _lastSlice = null;
@@ -442,7 +446,8 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
             // and make sure its percentages are set right
             if (current.equals(it.first())) {
                     current.newId(1);
-                    current.setPercentages(this.firstPercentage(),current.percentageSize());
+                    _startingPercentage = current.percentageStart();
+//                    current.setPercentages(this.firstPercentage(),current.percentageSize());
                 }
             // if ids dont match the order
             if (current.hasNext() && current.id() !== (current.next.id() - 1)) {
@@ -534,6 +539,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
             _percentageStartingAt = _start;
             _percentageEndingAt = _start + _covered;
         };
+        // TODO: make next/previous private!
         this.next = null;
         this.hasNext = function() {
             return (this.next !== null);
