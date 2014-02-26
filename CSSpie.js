@@ -795,6 +795,9 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         this.last = function() {
             return _pie.last();
         };
+        this.current = function(){
+            return _currentSlice;
+        };
         this.next = function() {
             _currentSlice = _currentSlice.next;
             return _currentSlice;
@@ -802,6 +805,26 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         this.previous = function() {
             _currentSlice = _currentSlice.previous;
             return _currentSlice.previous;
+        };
+        /**
+         * Checks if there is a next slice and if so changes the cursor to it!
+         * @returns {Boolean} true if nextSlice equals currentslice
+         */
+        this.hasNext = function() {
+            if (_currentSlice.equals(this.next())){
+                return false;
+            }
+            else return true;
+        };
+        /**
+         * Checks if there is a previous slice and if so changes the cursor to it!
+         * @returns {Boolean} true if previousSlice equals currentslice
+         */
+        this.hasPrevious = function() {
+            if (_currentSlice.equals(this.previous())){
+                return false;
+            }
+            else return true;
         };
     };
     /**
