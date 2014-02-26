@@ -385,8 +385,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
      *                              "top"-value to add
      */
     this.offsetSlicegroup = function(_slicegroupInt,_offsetValue){
-         // TODO
-         var slicegroup = this.getSlicegroupById(_slicegroupInt);
+         var slicegroup = this.slicegroups[_slicegroupInt-1];
          slicegroup.offsetSlicegroup(_offsetValue);
          this.update();
      };
