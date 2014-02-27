@@ -84,8 +84,12 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     this.sizeUnit = function() { return _sizeUnit; };
     this.sizeString = function() { return ( "" + _size + _sizeUnit); };
     // pieContainer - background of the pie and container for the slices ///////
-	// TODO: setBackground() for piecontainer
     var pieBackground = this._createBackground(_basecolorStr);
+	// TODO: image compatibility for piebackground
+    this.setBackground= function(_colorStr){
+        pieBackground.style.backgroundColor = _colorStr;
+        this.update();
+    };
     this.container = function() { return pieBackground; };
     //Pie HTML - the wrapping div of the resulting pie therefore the HTML of the pie
     var pieHTML = document.createElement("div");
