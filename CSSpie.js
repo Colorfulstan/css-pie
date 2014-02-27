@@ -808,7 +808,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         };
         this.previous = function() {
             _currentSlice = _currentSlice.previous;
-            return _currentSlice.previous;
+            return _currentSlice;
         };
         /**
          * Checks if there is a next slice and if so changes the cursor to it!
@@ -832,11 +832,72 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         };
     };
     /**
+     * The reversed Iterator starts at the last Slice and has its operations reversed:
+     * it.next returns currentSlice.previous so that the Iterator may 
+     * cycle from last to first Slice of the pie (it.first() and it.last() respectively) by only using .next()
+     * 
+     * Iterator doesnt affect the references within the pie.
+     * If Elements are changed during a loop through multiple iterators 
+     * might lead to unexpected results.
+     * 
+     * Use reversedIterator() to get your reversed Iterator.
+     * @param {type} _pie
+     * @returns {Pie.ReversedIterator}
+     */
+    function ReversedIterator(_pie) {
+        var _currentSlice = _pie.last();
+        this.first = function() {
+            return _pie.last();
+        };
+        this.last = function() {
+            return _pie.first();
+        };
+        this.current = function(){
+            return _currentSlice;
+        };
+        this.next = function() {
+            _currentSlice = _currentSlice.previous;
+            return _currentSlice;
+        };
+        this.previous = function() {
+            _currentSlice = _currentSlice.next;
+            return _currentSlice;
+        };
+        /**
+         * Checks if there is a next slice and if so changes the cursor to it!
+         * @returns {Boolean} true if nextSlice equals currentslice
+         */
+        this.hasNext = function() {
+            if (_currentSlice.equals(this.next())){
+                return false;
+            }
+            else return true;
+        };
+        /**
+         * Checks if there is a previous slice and if so changes the cursor to it!
+         * @returns {Boolean} true if previousSlice equals currentslice
+         */
+        this.hasPrevious = function() {
+            if (_currentSlice.equals(this.previous())){
+                return false;
+            }
+            else return true;
+        };
+    };
+    
+    /**
      * Returns an Iterator for the pie
      * @returns {Pie.Iterator}
      */
     this.iterator = function() {
         return new Iterator(this);
+    };
+    /**
+     * Returns an reversed Iterator for the pie
+     * @returns {Pie.Iterator}
+     */
+    this.reversedIterator = function() {
+        return new ReversedIterator(this);
     };
 }; // Pie END //////////////////////////////////////////////////////////////////
 /** Contains basic Methods neccessary to create a pie and its slices */
