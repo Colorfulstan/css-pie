@@ -61,6 +61,12 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     // size ////////////////////////////////
 //    var _size = (function(sizeStr) { return parseFloat(sizeStr);})(_sizeStr); // return of anonymous function as value
     var _size = parseFloat(_sizeStr);
+    this.setSize = function(_sizeValue){
+        _size = _sizeValue;
+        pieBackground.style.width = this.sizeString();
+        pieBackground.style.height = this.sizeString();
+        this.update();
+    };
     var _sizeUnit = (function(sizeString) { // function START //////////////////
         // trim spaces and remove the _size chars from it = unit
         var unit = sizeString.replace(("" + _size), "");
@@ -908,9 +914,9 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
         pieBackground.style.width = sizeString;
         pieBackground.style.height = sizeString;
         pieBackground.style.position = "relative";
-        pieBackground.style.webkitBorderRadius = sizeString;
-        pieBackground.style.mozBorderRadius = sizeString;
-        pieBackground.style.borderRadius = sizeString;
+        pieBackground.style.webkitBorderRadius = "100%";
+        pieBackground.style.mozBorderRadius = "100%";
+        pieBackground.style.borderRadius = "100%";
         pieBackground.style.backgroundColor = _basecolorStr;
         return pieBackground;
     },
