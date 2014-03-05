@@ -70,7 +70,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         // set size for the container in addition or at least a parent element on
         // the site with a set width/height to scale off of
         if (unit === '%') {
-            alert("Pie:'" + _id + 
+            Console.log("Pie:'" + _id + 
                     "' uses % values\n" + 
                     "These are not supported by CSSPie.js yet!\n" + 
                     "We'll use px instead for now\n" + 
@@ -447,10 +447,10 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
             
             // if current Slice is first set its id to 1
             // and make sure its percentages are set right
-            if (current.equals(it.first())) {
+            if (current.equals(this.first())) {
                     current.newId(1);
-                    _startingPercentage = current.percentageStart();
-//                    current.setPercentages(this.firstPercentage(),current.percentageSize());
+//                    _startingPercentage = current.percentageStart();
+                    current.setPercentages(this.firstPercentage(),current.percentageSize());
                 }
             // if ids dont match the order
             if (current.hasNext() && current.id() !== (current.next.id() - 1)) {
@@ -783,10 +783,6 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     /////////////////////////////////////////////////////////////////////////////////
     //------------------------------------------------------------------------//
     /**
-     * Iterator doesnt affect the references within the pie.
-     * If Elements are changed during a loop through multiple iterators 
-     * might lead to unexpected results.
-     * 
      * Use iterator() to get your Iterator
      * @param {type} _pie
      * @returns {Pie.Iterator}
@@ -794,9 +790,11 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     function Iterator(_pie) {
         var _currentSlice = _pie.first();
         this.first = function() {
+            _currentSlice = _pie.first();
             return _pie.first();
         };
         this.last = function() {
+            _currentSlice = _pie.last();
             return _pie.last();
         };
         this.current = function(){
@@ -836,10 +834,6 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
      * it.next returns currentSlice.previous so that the Iterator may 
      * cycle from last to first Slice of the pie (it.first() and it.last() respectively) by only using .next()
      * 
-     * Iterator doesnt affect the references within the pie.
-     * If Elements are changed during a loop through multiple iterators 
-     * might lead to unexpected results.
-     * 
      * Use reversedIterator() to get your reversed Iterator.
      * @param {type} _pie
      * @returns {Pie.ReversedIterator}
@@ -847,9 +841,11 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
     function ReversedIterator(_pie) {
         var _currentSlice = _pie.last();
         this.first = function() {
+            _currentSlice = _pie.last();
             return _pie.last();
         };
         this.last = function() {
+            _currentSlice = _pie.first();
             return _pie.first();
         };
         this.current = function(){
