@@ -1102,15 +1102,11 @@ function createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt
     var pieObject = new Pie(pieNameStr, pieSizeStr, basecolorStr);
     ////////////////////////////////////////
     // TODO
-    //If only 1 percentage -> all slices that percentage
-    //check coutn percentages
-    //if 1 -> calculate slicecount
-    // else check percentageSum
-    // if percentageSum = 100 ->  sliceCount = percentages.size();
+    // check percentageSum??
+    // if percentageSum = 100 ->  sliceCount = percentages.length;
     // else if percentageSum < 100 -> sliceCount = percentages.size() +1; missingPercentage = 100 - percentageSum;
     // 
     // TODO : handle percentageSum > 100?
-    //var numberOfSlicesInt = percentagesIntArr.length;
 
     //Creating the Slices 
     var percentageUsed = pieObject.firstPercentage();
@@ -1168,15 +1164,17 @@ function createEquallyDividedPie(pieNameStr, pieSizeStr, basecolorStr, numberOfS
     // round down = gap after last one
     // dont round yet, getting rounded after degree-conversion anyways = max 0.9*n degree overlap on end, min ~0.1*n degree
     var percentPerSlice = 100 / numberOfSlicesInt;
+    var percentArr = [percentPerSlice];
     //Creating the Slices 
-    var percentageUsed = pieObject.firstPercentage();
-    for (var i = 0; i < numberOfSlicesInt; i++) {
-        // lets the index begin with 0 when last index got used to loop over the array
-        // actual size of the array doesnt matter
-        var nxtClrIndex = i % colorsStrArr.length;
-        var nextColor = colorsStrArr[nxtClrIndex];
-        pieObject.addSlice(percentPerSlice, percentageUsed, nextColor);
-        percentageUsed += percentPerSlice;
-    }
+//    var percentageUsed = pieObject.firstPercentage();
+//    for (var i = 0; i < numberOfSlicesInt; i++) {
+//        // lets the index begin with 0 when last index got used to loop over the array
+//        // actual size of the array doesnt matter
+//        var nxtClrIndex = i % colorsStrArr.length;
+//        var nextColor = colorsStrArr[nxtClrIndex];
+//        pieObject.addSlice(percentPerSlice, percentageUsed, nextColor);
+//        percentageUsed += percentPerSlice;
+//    }
+    createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt, percentArr, colorsStrArr);
     return pieObject.html();
 }
