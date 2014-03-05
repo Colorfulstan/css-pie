@@ -529,6 +529,11 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         this.percentageSize = function(){
             return _percentageCovered;
         };
+        this.setPercentageSize = function(_covered){
+            _percentageCovered = _covered;
+            _percentageEndingAt = _percentageStartingAt + _covered;
+        };
+        
         var _percentageStartingAt = _percentageStartInt;
         this.percentageStart = function(){
             return _percentageStartingAt;
@@ -1001,13 +1006,17 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
         var nextSlice = this._createSlimSlice(50, _percentageStartInt, _colorString, _offsetX, _offsetY);
         var size = this.size();
         var unit = this.sizeUnit();
+        // adjust for visual glitch between parts of the slice
+        var visualfix = ((size - 50) / 2);
         // special clipping for 180° part (gap between two parts)
-        nextSlice.style.clip = "rect(0" + unit + "," + size + unit + "," + size + unit + "," + ((size - 100) / 2) + unit + ")";
+        nextSlice.style.clip = "rect(0" + unit + "," + size + unit + "," + size + unit + "," + visualfix + unit + ")";
         sliceContainer.appendChild(nextSlice);
         _percentageInt -= 50;
         _percentageStartInt += 50;
         //remaining part
         var nextSlice = this._createSlimSlice(_percentageInt, _percentageStartInt, _colorString, _offsetX, _offsetY);
+        // special clipping for 180° part (gap between two parts)
+        nextSlice.style.clip = "rect(0" + unit + "," + size + unit + "," + size + unit + "," + visualfix + unit + ")";
         sliceContainer.appendChild(nextSlice);
         return sliceContainer;
     },
