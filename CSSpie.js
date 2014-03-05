@@ -70,7 +70,7 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         // set size for the container in addition or at least a parent element on
         // the site with a set width/height to scale off of
         if (unit === '%') {
-            Console.log("Pie:'" + _id + 
+            console.log("Pie:'" + _id + 
                     "' uses % values\n" + 
                     "These are not supported by CSSPie.js yet!\n" + 
                     "We'll use px instead for now\n" + 
@@ -292,11 +292,11 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
      */
     this.isSlicegroupIdValid = function(_slicegroupInt){
        if (_slicegroupInt <= 0){
-           alert("slicegroupId is <= 0 and invalid"); // DEBUGG Info
+           console.log("isSlicegroupIdValid(): slicegroupId is <= 0 and invalid"); // DEBUGG Info
            return false;
        }
        if (_slicegroupInt > this.slicegroups.length){
-           alert("slicegroups.length <= _slicegroupIdInt - slicegroup Number " + _slicegroupInt + "doesnt exist"); // DEBUGG Info
+           console.log("isSlicegroupIdValid(): slicegroups.length <= _slicegroupIdInt - slicegroup Number " + _slicegroupInt + "doesnt exist"); // DEBUGG Info
            return false;
        }
        else {
@@ -627,7 +627,6 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
                 next.newId((this.id()) + 1);
                 next._updateFollowingIds();
             }
-//                alert("currently processing: " + this.id()); // DEBUGG INFO
             return;
         },
         /**
