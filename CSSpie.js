@@ -1115,11 +1115,12 @@ function createPieObject(pieNameStr, pieSizeStr, basecolorStr, numberOfSlicesInt
     //Creating the Slices 
     var percentageUsed = pieObject.firstPercentage();
     for (var i = 0; i < numberOfSlicesInt; i++) {
-        var piePercentage = percentagesIntArr[i];
-        pieObject.addSlice(piePercentage, percentageUsed, colorsStrArr[i]);
-//        var nextSlice = pieObject.createSlice(piePercentage, percentageUsed, colorsStrArr[i]);
-//        pieObject.container().appendChild(nextSlice);
-        percentageUsed += piePercentage;
+        var nxtPercentIndex = i % percentagesIntArr.length;
+        var nextPercent = percentagesIntArr[nxtPercentIndex];
+        var nxtClrIndex = i % colorsStrArr.length;
+        var nextColor = colorsStrArr[nxtClrIndex];
+        pieObject.addSlice(nextPercent, percentageUsed, nextColor);
+        percentageUsed += nextPercent;
     }
     return pieObject;
 }
