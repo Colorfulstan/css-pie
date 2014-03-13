@@ -9,11 +9,13 @@ for the much smaller original script.
 
 The Object Oriented Version lets you create and handle Pie-Objects 
 and comes with handy Methods for creating and manipulating slices.
-More to Come...
+
+A Quickstart-page can be found under http://colorfulstan.github.io/css-pie/ 
+with Examples for the most important features.
 
 WIP:
 ----
-Demopage for Overview of Pie-object functionalities with examples
+
 
 -------------------------------------------------------------------
 IF YOU WANT TO CONTRIBUTE:
