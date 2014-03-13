@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="top">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CSSPie.js -</title>
+<link href="css/normalize.css" rel="stylesheet" type="text/css" />
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+
+<!--  Google-Font -->
+<link href='http://fonts.googleapis.com/css?family=Tinos:400,700' rel='stylesheet' type='text/css'>
+<script src="file:///C|/Users/Jay/Documents/GitHub/css-pie/CSSpie.js">
+</script>
+<script src="js/prefixfree.min.js">
+</script>
+</head>
+<body>
+<div id="content">
+	<nav id=sideNav-jumplist> </nav>
+	<section id="pie-create">
+		<div class="exampleWrapper" id="pieCreation">
+			<h2 class="jumplist-anchor">Create a Pie-Object and add it to your site</h2>
+			<code>var pie = <br />
+			new Pie(&quot;id&quot;,"1234pxemexptincm","CSS3color");<br />
+			htmlElement.appendChild(pie.html());</code>
+			<div>
+				<script>
+var pie;
+var pie2;
+</script>
+				<form>
+					<input type="button" value="pie = new Pie('pie1','10px','#333')" onclick="pie=new Pie('pie1','10px','#333');this.parentNode.parentNode.insertBefore(pie.html(), this.parentNode);" />
+					<input type="button" value="pie2 = new Pie('pie2','5em','rgba(255,143,10,0.3)')" onclick="pie2=new Pie('pie2','5em','rgba(255,143,10,0.3)');this.parentNode.parentNode.insertBefore(pie2.html(), this.parentNode);" />
+				</form>
+			</div>
+		</div>
+		<div class="exampleWrapper collapsable" id="pieChangeBg">
+			<h3 class="jumplist-anchor">change its Background</h3>
+			<code>pie.setBackground("CSS3 Color");</code>
+			<div>
+				<script>
+                    var pieBg = new Pie("pieBg","50px","#333");
+					pieBg.addSlice(25,0, "#fff");
+					var div = document.getElementById("pieChangeBg").getElementsByTagName("div")[0];
+                    div.appendChild(pieBg.html());
+</script>
+				<form>
+					<input type="button" value=".setBackground('black')" onclick="pieBg.setBackground('black');" />
+					<input type="button" value=".setBackground('#AAA')" onclick="pieBg.setBackground('#AAA');" />
+				</form>
+			</div>
+		</div>
+		<div class="exampleWrapper collapsable" id="pieChangeSize">
+			<h3 class="jumplist-anchor">change its Size</h3>
+			<code>pie.setSize(value);</code>
+			<div>
+				<script>
+                    var pieSize = new Pie("pieSize","50px","#333");
+					pieSize.addSlice(25,50, "#fff");
+					var div = document.getElementById("pieChangeSize").getElementsByTagName("div")[0];
+                    div.appendChild(pieSize.html());
+</script>
+				<form>
+					<input type="button" value=".setSize(10)" onclick="pieSize.setSize(10);" />
+					<input type="button" value=".setSize(150)" onclick="pieSize.setSize(150);" />
+				</form>
+			</div>
+		</div>
+	</section>
+	<section id="pie-slices">
+		<div class="exampleWrapper collapsable" id="addSlice">
+			<h2 class="jumplist-anchor">Add / Remove Slice</h2>
+			<p><code>pie.addSlice(howbig%, start%, "CSS3Color or url(...)");</code></p>
+			<p><code> pie.removeSlice(sliceId); </code> </p>
+			<div>
+				<script>
+                    var pieAdd = new Pie("pieAdd","50px","#333");
+					var div = document.getElementById("addSlice").getElementsByTagName("div")[0];
+                    div.appendChild(pieAdd.html());
+                </script>
+				<form>
+					<input type="button" value=".addSlice(25,0,'white')" onclick="pieAdd.addSlice(25,0,'white');" />
+					<input type="button" value=".addSlice(10,10,'red')" onclick="pieAdd.addSlice(10,10,'red');" />
+					<input type="button" value=".addSlice(30,50,'#000')" onclick="pieAdd.addSlice(30,50,'#000');" />
+					<input type="button" value=".addSlice(25,20,'green')" onclick="pieAdd.addSlice(25,20,'green');" />
+					<br />
+					<input type="button" value=".removeSlice(1)" onclick="pieAdd.removeSlice(1)" />
+					<input type="button" value=".removeSlice(3)" onclick="pieAdd.removeSlice(3)" />
+				</form>
+			</div>
+		</div>
+		<div class="exampleWrapper collapsable" id="moveSlice">
+			<h3 class="jumplist-anchor">Move / Offset Slices</h3>
+			<code>pie.moveSlice(sliceId, left+, top+);<br />
+			pie.offsetSlice(sliceId, offset+);</code>
+			<div>
+				<script>
+var pieTest = createPieObject("pieTest","100px","transparent", 4, [60,20,10,10,],["green","blue","black","red"]);
+						var div = document.getElementById("moveSlice").getElementsByTagName("div")[0];
+						div.appendChild(pieTest.html());
+                    </script>
+				<form>
+					<input type="button" value=".moveSlice(1, 10, 0);" onclick="pieTest.moveSlice(1, 10, 0);" />
+					<input type="button" value=".moveSlice(1, -10, 0);" onclick="pieTest.moveSlice(1, -10, 0);" />
+					<input type="button" value=".moveSlice(1, 0, 10)" onclick="pieTest.moveSlice(1, 0, 10);" />
+					<input type="button" value=".moveSlice(1, 0, -10)" onclick="pieTest.moveSlice(1, 0, -10);" />
+					<input type="button" value=".offsetSlice(3, 10);" onclick="pieTest.offsetSlice(3, 10);" />
+					<input type="button" value=".offsetSlice(3, -10);" onclick="pieTest.offsetSlice(3, -10);" />
+				</form>
+			</div>
+		</div>
+		<div class="exampleWrapper collapsable" id="removeAllSlicesHTML">
+			<h3 class="jumplist-anchor">&quot;hide&quot; slices from html</h3>
+			<code>pie.dropSlices();<br />
+			pie.update();</code>
+			<div>
+				<script>
+                            var pieClear = createPieObject("pieClear", "50px", "#333", 4,[10,30,20,40],["red", "blue", "green", "black"]);
+                            var div = document.getElementById("removeAllSlicesHTML").getElementsByTagName("div")[0];
+                            div.appendChild(pieClear.html());
+                 </script>
+				<form>
+					<input type="button" value=".dropSlices()" onclick="pieClear.dropSlices();" />
+					<input type="button" value=".update()" onclick="pieClear.update();" />
+				</form>
+			</div>
+		</div>
+	</section>
+	<section id="pie-slices-mpl">
+		<div class="exampleWrapper" id="receiveSlice">
+			<h2 class="jumplist-anchor">Sliceobjects</h2>
+			<code>pie.getSliceById(sliceId);</code>
+			<div>
+				<script>
+                    //var pieTest = createPieObject("pieTest","100px","transparent", 4, [60,20,10,10,],["green","blue","black","red"]);
+					//var currentSlice = pieTest.getSliceById(1);
+					var choice = 1;
+                </script>
+			</div>
+		</div>
+		<div id="changeBg" class="exampleWrapper collapsable">
+			<h3 class="jumplist-anchor">change background</h3>
+			<code> var slice = pie.getSlice(sliceId);<br />
+			slice.setBackground("CSS3Color or url(...)");<br />
+			pie.update();</code>
+			<div>
+				<script>
+var pieChange = createPieObject("pieChange","100px","transparent", 1, [60],["green"]);
+						var div = document.getElementById("changeBg").getElementsByTagName("div")[0];
+						div.appendChild(pieChange.html());
+</script>
+				<form>
+					<input type="button" value="slice.setBackground('#333')" onclick="pieChange.getSliceById(choice).setBackground('#333');pieChange.update();" />
+					<input type="button" value="slice.setBackground('green')" onclick="pieChange.getSliceById(choice).setBackground('green');pieChange.update();" />
+				</form>
+			</div>
+		</div>
+		<div id="changePerc" class="exampleWrapper collapsable">
+			<h3 class="jumplist-anchor">change size / startingpoint</h3>
+			<code> var slice = pie.getSlice(sliceId);<br />
+			slice.setPercentageSize(size%);<br />
+			pie.update();</code>
+			<div>
+				<script>
+var pieChangeSize = createPieObject("pieChangeSize","100px","transparent", 2, [10,60],["green","blue","black","red"]);
+						var div = document.getElementById("changePerc").getElementsByTagName("div")[0];
+						div.appendChild(pieChangeSize.html());
+</script>
+				<form>
+					<input type="button" value=".setPercentageSize(50)" onclick="pieChangeSize.getSliceById(1).setPercentageSize(50);pieChangeSize.update();" />
+					<input type="button" value=".setPercentageSize(30)" onclick="pieChangeSize.getSliceById(choice).setPercentageSize(30);pieChangeSize.update();" /><br />
+<input type="button" value="pie.setNewStart(25);" onclick="pieChangeSize.setNewStart(25);" />
+					<input type="button" value="pie.setNewStart(10);" onclick="pieChangeSize.setNewStart(10);" />
+				</form>
+			</div>
+		</div>
+	</section>
+	<section id="pie-slicegroups">
+		<div id="groupSlices" class="exampleWrapper">
+			<h2 class="jumplist-anchor">Slicegroups</h2>
+			<code>pie.groupSlices(firstSliceId, lastSliceId);</code>
+			<div>
+				<script>
+				var sg;
+</script>
+				<form>
+					<input type="button" value=".groupSlices(1,2)" onclick="sg = pieGroupSlices.groupSlices(1,2);" />
+					<input type="button" value=".groupSlices(3,5)" onclick="sg = pieGroupSlices.groupSlices(3,5);" />
+				</form>
+			</div>
+		</div>
+		<div id="receiveSG" class="exampleWrapper">
+			<h2 class="jumplist-anchor">Slicegroup Objects</h2>
+			<code>var slicegroupFromArray= <br />
+			pie.slicegroups[index];<br />
+			var slicegroupThroughSlice = pie.findSlicegroupContaining(sliceId);<br />
+			var slicegroupThroughGrouping = pie.groupSlices(firstSliceId, lastSliceId);</code>
+			<div>
+				<script>
+</script>
+				<form>
+					<input type="button" value=".slicegroups[0]" onclick="alert(pieGroupSlices.slicegroups[0]);sg = pieGroupSlices.slicegroups[0]" />
+					<input type="button" value=".slicegroups[1]" onclick="alert(pieGroupSlices.slicegroups[1]);sg = pieGroupSlices.slicegroups[1];" />
+					<br />
+					<input type="button" value=".findSlicegroupContaining(1)" onclick="sg = pieGroupSlices.findSlicegroupContaining(1)" />
+					<input type="button" value=".findSlicegroupContaining(3)" onclick="sg = pieGroupSlices.findSlicegroupContaining(3);" />
+					<br />
+					<input type="button" value=".groupSlices(1,4)" onclick="sg = pieGroupSlices.groupSlices(1,4);" />
+					<input type="button" value=".groupSlices(2,3)" onclick="sg = pieGroupSlices.groupSlices(2,3);" />
+				</form>
+			</div>
+		</div>
+		<div id="moveSG" class="exampleWrapper collapsable">
+			<h3 class="jumplist-anchor">Move / Offset</h3>
+			<code>pie.moveSlicegroup(sliceId, left+, top+);<br />
+			pie.offsetSlicegroup(sliceId, offset+);<br />
+			</code>
+			<div>
+				<script>
+var pieGroupSlices = createPieObject("pieGroupSlices","100px","transparent", 5, [40,20,10,10,20],["green","blue","black","red","#333"]);
+						var div = document.getElementById("moveSG").getElementsByTagName("div")[0];
+						div.appendChild(pieGroupSlices.html());
+</script>
+				<form>
+					<input type="button" value=".moveSlicegroup(sg, 10, 0);" onclick="pieGroupSlices.moveSlicegroup(sg.id(), 10, 0);" />
+					<input type="button" value=".moveSlicegroup(sg, -10, 0);" onclick="pieGroupSlices.moveSlicegroup(sg.id(), -10, 0);" />
+					<input type="button" value=".moveSlicegroup(sg, 0, 10)" onclick="pieGroupSlices.moveSlicegroup(sg.id(), 0, 10);" />
+					<input type="button" value=".moveSlicegroup(sg, 0, -10)" onclick="pieGroupSlices.moveSlicegroup(sg.id(), 0, -10);" />
+					<br />
+					<input type="button" value=".offsetSlicegroup(sg), 10);" onclick="pieGroupSlices.offsetSlicegroup(sg.id(), 10);" />
+					<input type="button" value=".offsetSlicegroup(sg, -10);" onclick="pieGroupSlices.offsetSlicegroup(sg.id(), -10);" />
+				</form>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div id="independentSlices" class="exampleWrapper collapsable">
+			<h2 class="jumplist-anchor">Slicemanipulation within groups</h2>
+			<!--<code>dkjfgkdfkdfkdfg</code>-->
+			<div>
+				<script>
+			var pieIndependent = createPieObject("pieIndependent","100px","transparent", 5, [40,20,10,10,20],["green","blue","black","red","#333"]);
+					var div = document.getElementById("independentSlices").getElementsByTagName("div")[0];
+					div.appendChild(pieIndependent.html());
+					var slicegroup = pieIndependent.groupSlices(1,3);
+					pieIndependent.offsetSlicegroup(slicegroup.id(),30);
+</script>
+				<form>
+					<input type="button" value="offset Slicegroup" onclick="pieIndependent.offsetSlicegroup(slicegroup.id(),10);" />
+					<input type="button" value="offset Slice 2" onclick="pieIndependent.offsetSlice(2,10);" />
+				</form>
+			</div>
+		</div>
+		<div id="ungroupSlices" class="exampleWrapper">
+			<h2 class="jumplist-anchor">Ungroup Slices</h2>
+			<code>pie.ungroupSlicegroup(sliceId);<br />
+			ungroupSlicegroupContaining(sliceId);</code>
+			<div>
+				<script>
+//dfghkdfkdfk
+</script>
+				<form>
+					<input type="button" value=".ungroupSlicegroup(1)" onclick="pieIndependent.ungroupSlicegroup(1);" />
+					<input type="button" value=".ungroupSlicegroupContaining(2)" onclick="pieIndependent.ungroupSlicegroupContaining(2);" />
+				</form>
+			</div>
+		</div>
+	</section>
+	<section id="pie-advanced">
+		<div id="createIterator" class="exampleWrapper collapsable">
+			<h2 class="jumplist-anchor">The Iterator(s)</h2>
+			<code>var it = pie.iterator();<br />
+			var it = pie.reversedIterator();</code>
+			<div>
+				<script>
+				var pieAdvanced = createPieObject("pieAdvanced","100px","transparent", 10, [10],["green","blue","black","red"]);
+						var div = document.getElementById("createIterator").getElementsByTagName("div")[0];
+						div.appendChild(pieAdvanced.html());
+				var iterator;
+</script>
+				<form>
+					<input type="button" value="create Iterator" onclick="iterator = pieAdvanced.iterator();" />
+					<input type="button" value="create reversed Iterator" onclick="iterator = pieAdvanced.reversedIterator();" />
+				</form>
+			</div>
+		</div>
+		<div id="getFirstLast" class="exampleWrapper">
+			<h3 class="jumplist-anchor">first / last <br />
+next / previous</h3>
+			<code>var firstSlice = it.first();<br />
+			var lastSlice = it.last();</code>
+			<div>
+				<script>
+</script>
+				<form>
+					<input type="button" value="offset first Slice" onclick="pieAdvanced.offsetSlice(iterator.first().id(), 20);" />
+					<input type="button" value="offset last Slice" onclick="pieAdvanced.offsetSlice(iterator.last().id(), 20);" /><br />
+
+					<input type="button" value="next" onclick="pieAdvanced.offsetSlice(iterator.next().id(), 20);" />
+					<input type="button" value="previous" onclick="pieAdvanced.offsetSlice(iterator.previous().id(), 20);" />
+				</form>
+			</div>
+		</div>
+		<!--<div id="getNext" class="exampleWrapper">
+			<h3 class="jumplist-anchor">next or previous Slice</h3>
+			<code>var nextSlice_1 = it.next();<br />
+			var nextSlice_2 = pie.next();</code>
+			<div>
+				<script>
+//dfghkdfkdfk
+</script>
+				<form>
+					<input type="button" value="cycle through slices moving each further" onclick="iteratorDemonstration(pieAdvanced, true)" />
+					<input type="button" value="cycle through slices backwards moving each further" onclick="iteratorDemonstration(pieAdvanced, false)" />
+				</form>
+			</div>
+		</div>-->
+	</section>
+	<div id="exampleControl">
+		<div id="expandExamples"  onclick="checkAllBoxes();" title="expand all Examples">
+			+ expand all
+		</div>
+		<div id="collapseExamples" onclick="uncheckAllBoxes();" title="collapse all Examples" href="#">
+			- collapse all
+		</div>
+		<a href="#top" title="top of page">^ go to Top</a>
+	</div>
+	<div id="manual">
+		<p>To get started right away get the Library from ... and start by adapting one of the scripts within the example divs.</p>
+	</div>
+</div>
+<script>
+// create checkboxes and labels for all examples with generic ids
+// get all relevant divs
+var allExampleWrapperDivs = document.getElementsByClassName("collapsable");
+for (var i = 0; i < allExampleWrapperDivs.length; i++){
+	var currentDiv = allExampleWrapperDivs[i];
+	var genericId = "cb" + (i+1);
+	
+// create elements
+	//"<label for='" + genericId +"' class='toggleExample'>see/hide Example</label>"
+	var label = document.createElement('label');
+	label.setAttribute('for',genericId);
+	label.setAttribute('class','toggleExample');
+	label.innerHTML = 'show/hide Example';
+	
+	
+	//'<input class="toggleExample" type="checkbox" id="'+ genericId +'"/>'
+	var input = document.createElement('input');
+	input.setAttribute('id',genericId);
+	input.setAttribute('class','toggleExample');
+	input.setAttribute('type','checkbox');
+	
+// insertBefore first div-child
+	currentDiv.insertBefore(input,currentDiv.getElementsByTagName('div')[0]);
+	currentDiv.insertBefore(label,currentDiv.getElementsByTagName('div')[0]);
+}
+
+var uncheckAllBoxes = function(){
+	var allInputs = document.getElementsByTagName("input");
+	for (var i = 0; i < allInputs.length; i++){
+		input = allInputs[i];
+		if(input.getAttribute("type") === "checkbox"){
+			input.checked = false;
+		}
+	};
+};
+	
+var checkAllBoxes = function(){
+	var allInputs = document.getElementsByTagName("input");
+	for (var i = 0; i < allInputs.length; i++){
+		input = allInputs[i];
+		if(input.type === "checkbox"){
+			input.checked = true;
+		}
+	};
+};
+/**
+* creates a JumpNav (links to ids) from H2 and H3s of the page
+*
+*/
+var createJumpNavFromHx = function(){
+		// <a href="id" title="h2/3">first word/til first space from h2/3</a>
+		var nav = document.getElementById("sideNav-jumplist");
+		var allAnchors = document.getElementsByClassName("jumplist-anchor");
+		for (var i= 0; i< allAnchors.length; i++){
+				var numbering_1 = 1;
+				var numbering_2 = 1;
+				var numbering_3 = 1;
+				var currentAnchor = allAnchors[i];
+				var anchorId = currentAnchor.parentNode.getAttribute("id");
+				// create link
+				var newLink = document.createElement("a");
+				newLink.setAttribute("href","#" + anchorId);
+					// get text before first space
+				var text = currentAnchor.innerHTML;
+				newLink.innerHTML = text;
+				var currentTag = currentAnchor.tagName;
+				switch(currentTag){
+					case "H2":// h2
+					case "h2":
+						newLink.className += " h2-link";// h2 class
+						// numbering_1
+						break;
+					case "H3":// h3
+					case "h3":
+						newLink.className += " h3-link";// h3 class
+						// numbering_1 + "." + numbering_2
+						break;
+					default:// others
+						newLink.className += " other-link";// others class
+						// numbering_1 + "." + numbering_2 + "." + numbering_3
+						break;
+				};
+				nav.appendChild(newLink);
+			};	
+	};
+createJumpNavFromHx();
+/**
+* offsets all slices of the given pie starting with 10
+* increasing by 10 every slice
+*
+* @param _forwardBool - true = iteration from first to last
+*						false = iteration from last to first
+*
+*/
+var iteratorDemonstration = function(_pieObject, _forwardBool ){
+	var value = 10;
+	// true TODO
+	if (_forwardBool){
+		var iterator = _pieObject.iterator();
+	}
+	else
+	{
+		var iterator = _pieObject.reversedIterator();
+	}
+	var nextSlice = iterator.first();
+	do {
+		_pieObject.offsetSlice(iterator.current().id(),value);
+		value += 10;
+		} while (iterator.hasNext());
+};
+</script>
+</body>
+</html>
