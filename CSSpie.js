@@ -198,6 +198,26 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         
         return _currentSlice;
     };
+        /**
+     * Adds a Slice with an onclick-Handler after possibly existing Slices and moves Cursor to the new slice
+     * @param {Int} _percentageInt 
+     *                          value how big the slice will be in percent of the pie
+     * @param {Int} _percentageStartInt 
+     *                                      value at which the slice starts (0=top mid of circle)
+     *                                      Only relevant if you dont create Pie.update()
+     *                                      Or a single Slice
+     * @param {type} _onclickString
+     *                                      String to be placed within the "onclick" attribute of the Slice
+     * @param {String} _backgroundStr String with background (any legal css colorvalue or url(...) to image)
+     * @returns {Slice} the added, new currentSlice
+     */
+    this.addClickableSlice = function(_percentageInt, _percentageStartInt, _onclickString, _backgroundStr) {
+        var newSlice = this.addSlice(_percentageInt, _percentageStartInt, _backgroundStr);
+        newSlice.onclick(_onclickString);
+        this.update();
+        return newSlice;
+    };
+    
     /**
      * Removes a slice from the pie and updates its html.
      * Remaining Slices will adapt there position on the pie to fill the gap.
@@ -518,6 +538,10 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
         this.newId = function(idInt) {
             _id = idInt;
         };
+        var onclickString = "";
+        this.onclick = function(_onclickString){
+            onclickString = _onclickString;
+        };
         // BACKGROUND //////////////////
         var _background = _backgroundStr;
         this.setBackground = function(_backgroundStr){
@@ -568,7 +592,11 @@ function Pie(_idStr, _sizeStr, _basecolorStr) { // Pie START ///////////////
          * @returns {HTML} - HTML-Element - HTML-Code of the slice
          */
         this.html = function() {
-            return pie.createSlice(_percentageCovered, _percentageStartingAt, _background, _offsetX, _offsetY);
+            if (onclickString !== ""){
+                return pie.createClickableSlice(_percentageCovered, _percentageStartingAt, onclickString, _background, _offsetX, _offsetY);
+            } else {
+                return pie.createSlice(_percentageCovered, _percentageStartingAt, _background, _offsetX, _offsetY);
+            }
         };
         /**
          * Method offsets the slice by given values for top/right
@@ -938,19 +966,12 @@ Pie.prototype = { // Pie.prototype Start ///////////////////////////////////////
         }
         return sliceHtml;
     },     
-//    createSliceLink: function(_percentageInt, _percentageStartInt, _linkURLStr, _basecolorStr, _offsetX, _offsetY){
-        // TODO WIP
-//        var sliceLink = document.createElement("a");
-//        var sliceHtml = this._createSlice(_percentageInt, _percentageStartInt, true, _basecolorStr, null);
-//        sliceLink.appendChild(sliceHtml);
-//                
-//        sliceLink.style.top = _offsetY + "" + this.sizeUnit();
-//        sliceLink.style.left = _offsetX + "" + this.sizeUnit();
-//        if (parseInt(_offsetX) !== 0 || parseInt(_offsetY) !== 0){
-//            sliceLink.style.zIndex += 1;
-//        }
-//        return sliceLink;
-//    },
+    createClickableSlice: function(_percentageInt, _percentageStartInt, _onclickString, _basecolorStr, _offsetX, _offsetY){
+        var sliceHtml = this._createSlice(_percentageInt, _percentageStartInt, _basecolorStr);
+        sliceHtml.setAttribute("onclick",_onclickString);
+        sliceHtml.style.cursor = "pointer";
+        return sliceHtml;
+    },
     _createSlice: function(_percentageInt, _percentageStartInt, _backgroundStr) {
         if (_percentageInt <= 50) {
             var sliceHtml = this._createSlimSlice(_percentageInt, _percentageStartInt, _backgroundStr);
